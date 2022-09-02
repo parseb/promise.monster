@@ -1,0 +1,19 @@
+.App {
+  text-align: center;
+}
+
+body {
+  background-color: lightslategray;
+}
+
+.logo-text {
+  color: white
+}
+
+.main-container {
+  margin-top: 10px;
+}
+
+.about-description {
+  color: white;
+}
