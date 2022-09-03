@@ -1,3 +1,6 @@
 [submodule "foundry/lib/openzeppelin-contracts"]
 	path = foundry/lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "foundry/lib/delegatable-sol"]
+	path = foundry/lib/delegatable-sol
+	url = https://github.com/delegatable/delegatable-sol
