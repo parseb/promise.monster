@@ -4,3 +4,6 @@
 [submodule "foundry/lib/delegatable-sol"]
 	path = foundry/lib/delegatable-sol
 	url = https://github.com/delegatable/delegatable-sol
+[submodule "foundry/lib/aave-v3-core"]
+	path = foundry/lib/aave-v3-core
+	url = https://github.com/aave/aave-v3-core
