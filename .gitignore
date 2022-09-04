@@ -1,0 +1,6 @@
+foundry/out/*
+react/.env
+react/.secret
+react/secrets
+react/.secrets
+react/.key

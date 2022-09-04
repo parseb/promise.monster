@@ -10,12 +10,14 @@ pragma solidity 0.8.15;
 import "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "delegatable-sol/Delegatable.sol";
 
+//import "aave-v3-core/contracts/interfaces/.... .sol"
+
 contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable("Promise.Monster", "1") {
     
-    address AAVE;
+    address public AAVE;
 
   constructor()  {
-
+    AAVE = address(7743);
   }
 
 

@@ -13,5 +13,6 @@ contract MonsterTest is Test {
 
     function testDeployed() public {
         assertTrue(address(PM) != address(0), "Not deployed");
+        assertTrue(PM.AAVE() != address(0), "AAVE undefined");
     }
 }

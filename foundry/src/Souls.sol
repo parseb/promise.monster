@@ -1,0 +1,1 @@
+//// Maybe embedd ERC20 Token for world domination purposes
