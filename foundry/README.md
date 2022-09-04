@@ -1,8 +1,22 @@
 # Promise.Monster (P👾M)
 
+### Life and Aspirations of a Promise
 
+#### States
+- Created
+- Active
+- Honoured
+- Broken
+- Indeterminate
 
+#### Events
+- Issued
+- Updated
+- Settled
 
+#### Types
+- Free Floating - Transferable - Becomes Active on first transfer
+- Fixed - Between two strict parties
 
 
 ## End goal success conditions
@@ -18,7 +32,10 @@
 - Deposit & Delegate Loan
 
 ### Peak Success Use Case 4:
-- Wrap Stablecoin
+- Wraped Stablecoin
+
+### 
+- DAO loans to members &|| microcredit
 
 ### Misc:
 - save Promise templates it IPFS

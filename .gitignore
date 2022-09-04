@@ -1,4 +1,5 @@
-foundry/out/*
+foundry/out
+foundry/cache
 react/.env
 react/.secret
 react/secrets
