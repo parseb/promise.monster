@@ -14,15 +14,20 @@
 - Updated
 - Settled
 
-#### Types
+#### Possible Types
 - Free Floating - Transferable - Becomes Active on first transfer
 - Fixed - Between two strict parties
+- Time Sensitive
+- Asset Bearing
+- Simple
 
 
 ## End goal success conditions
 
 ### Success Use Case 1: Simple Promise
 - I promise `Contract.fx()` will return true.
+- I promise to Yeet
+
 
 ### Success Use Case 2: Trusted NFT Loan
  - Ability to loan out token on the basis of a promise. <br>
