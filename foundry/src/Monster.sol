@@ -54,7 +54,8 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         Standing state; /// lifecycle state
         uint256 liableID; /// liable soul
         address claimOwner; /// creditor
-        bytes content; 
+        SignedDelegation content; /// signed delegation
+        uint256[2] times; /// executable within timeframe [starting with | until].
     }
 
     struct Asset {
@@ -64,7 +65,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     }
 
     constructor() {
-        AAVE = address(7743);
+        AAVE = address(bytes20("placeholder"));
         globalID = 11;
     }
 
@@ -93,7 +94,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     /// @notice permantently registers sender as indebtness capable soul
     function mintSoul() public returns (uint256) {
         if (!_isEOA()) {
-            revert SoullessMachine(); /// contracts might have souls. don't know yet.
+            revert SoullessMachine(); /// @dev contracts might have souls. don't know yet.
         }
         require(hasOrIsPromised[msg.sender].length == 0 || hasOrIsPromised[msg.sender][0] == 0, "already owned");
         _incrementID();
@@ -154,9 +155,9 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         _burn(assetID_);
     }  
 
-
-    ///// External
-
+    /// @notice mints promise 
+    /// @param to_: who is being promised
+    /// @param promise_: what is being promised 
     function mintPromise(address to_, bytes memory promise_) external isSoul returns (uint256) {
         Promise memory newP;
         newP.state = Standing.Created;
