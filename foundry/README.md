@@ -45,6 +45,9 @@
 ### Misc:
 - save Promise templates it IPFS
 
+________
+
+https://thedefiant.io/nft-markets-betray-web3-royalties
 
 ________________
 

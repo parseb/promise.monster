@@ -10,6 +10,8 @@ pragma solidity 0.8.15;
 import "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "delegatable-sol/Delegatable.sol";
+import "delegatable-sol/TypesAndDecoders.sol";
+
 
 //import "aave-v3-core/contracts/interfaces/.... .sol"
 
@@ -48,16 +50,11 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     // }
 
 
-
-
-
     struct Promise {
-        Standing state;
-        /// lifecycle state
-        uint256 liableID;
-        ///
-        address claimOwnerId;
-        bytes content;
+        Standing state; /// lifecycle state
+        uint256 liableID; /// liable soul
+        address claimOwner; /// creditor
+        bytes content; 
     }
 
     struct Asset {
@@ -81,9 +78,11 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     event idIncremented();
     event newSoulAcquired(address indexed who, uint256 indexed soulID);
     event burdenTransfer(uint256 indexed claim, uint256 indexed destinationSoul);
+    event assetTokenCreated(address contractAsset, uint quantity, address assetOwner);
 
     //// Modifiers
 
+    /// @notice modifier checks the sender has
     modifier isSoul() {
         require(getSoulID(msg.sender) != 0, "unreppenting soul");
         _;
@@ -94,7 +93,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     /// @notice permantently registers sender as indebtness capable soul
     function mintSoul() public returns (uint256) {
         if (!_isEOA()) {
-            revert SoullessMachine();
+            revert SoullessMachine(); /// contracts might have souls. don't know yet.
         }
         require(hasOrIsPromised[msg.sender].length == 0 || hasOrIsPromised[msg.sender][0] == 0, "already owned");
         _incrementID();
@@ -110,8 +109,9 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     /// @notice wraps assets in an ERC721 token
     /// @param contract_ address of the token contract
     /// @param howmuch_ quantity of ERC20 or ERC721 token ID
-    function makeAsset(address contract_, uint8 assetType, uint256 howmuch_) external returns (bool s) {
+    function makeAsset(address contract_, uint8 assetType, uint256 howmuch_, address to_) external returns (bool s) {
         require(assetToken[globalID].tokenAddress == address(0), "Asset exists");
+        if (to_ == address(0)) to_ = _msgSender();
         globalID = incrementIDAsset();
         assetToken[globalID].tokenAddress = contract_;
         assetToken[globalID].assetType = assetType;
@@ -131,39 +131,64 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         }
         require(s, "Failed to register asset");
 
-        _mint(_msgSender(), globalID);
+        _mint(to_, globalID);
+
+        emit assetTokenCreated(contract_, howmuch_, to_);
         
     }
 
-    function burnAsset(uint assetID_) public returns (bool s){
-        require( ownerOf(assetID_) == _msgSender(), 'Unauthorized');
+    /// @notice burns asset token, transfers underlying to specified address or sender
+    /// @param assetID_: ID of token
+    function burnAsset(uint assetID_, address to_) external returns (bool s){
+        require( ownerOf(assetID_) == _msgSender(), '--Unauthorized');
+
+        if (to_ == address(0)) to_ = _msgSender();
         Asset memory A = assetToken[assetID_];
-        if (A.assetType == 1) s= IERC20(A.tokenAddress).transfer(_msgSender(), A.howMuch);
+        if (A.assetType == 1) s= IERC20(A.tokenAddress).transfer(to_, A.howMuch);
         if (! s) { 
-            IERC721(A.tokenAddress).transferFrom(address(this), _msgSender(), A.howMuch);
+            IERC721(A.tokenAddress).transferFrom(address(this), to_, A.howMuch);
             s = IERC721(A.tokenAddress).ownerOf(A.howMuch) != address(this);
         }
         require(s, "Failed to Burn Asset");
         delete assetToken[assetID_];
         _burn(assetID_);
-    }   
+    }  
+
+
     ///// External
 
-    function mintPromise() external isSoul returns (uint256) {
-        require(_isEOA(), "soulless machine");
+    function mintPromise(address to_, bytes memory promise_) external isSoul returns (uint256) {
+        Promise memory newP;
+        newP.state = Standing.Created;
+        newP.liableID = getSoulID(msg.sender); 
+        uint pID = _incrementID();
+        if (pID % 10 == 0 ) pID +=1;
+        if (pID % 2 != 0) pID += 1; /// @dev 
+
+        
+        globalID = pID;
+        
+        hasOrIsPromised[_msgSender()].push(pID);
+        if (hasOrIsPromised[to_].length == 0) hasOrIsPromised[to_].push(0);
+        hasOrIsPromised[to_].push(pID);
+
+        getPromise[pID] = newP;
     }
 
-    function executePromise() external returns (bool) {}
+    function executePromise() external returns (bool) {
+
+    }
 
     ///// Private
 
 
     /// @notice increments global ID
-    function _incrementID() private {
+    function _incrementID() private returns (uint) {
         unchecked {
             ++globalID;
         }
         emit idIncremented();
+        return globalID;
     }
 
     function incrementIDAsset() private returns (uint gid_) {
@@ -223,6 +248,8 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         }
     }
 
+    /////////////
+
     function _msgSender() internal view override (Context, DelegatableCore) returns (address sender) {
         if (msg.sender == address(this)) {
             bytes memory array = msg.data;
@@ -236,4 +263,26 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         }
         return sender;
     }
+
+    function enforceCaveat(
+        bytes calldata terms,
+        Transaction calldata transaction,
+        bytes32 delegationHash
+     ) public pure returns (bool) {
+    // Owner methods are not delegatable in this contract:
+    bytes4 targetSig = bytes4(transaction.data[0:4]);
+
+    // transferOwnership(address newOwner)
+    require(targetSig != 0xf2fde38b, "transferOwnership is not delegatable");
+
+    // renounceOwnership() 
+    require(targetSig != 0x79ba79d8, "renounceOwnership is not delegatable");
+
+    // 3fb89d84  =>  mintPromise(address,bytes)  
+    require(targetSig != 0x3fb89d84, "cannot promise");
+
+    return true;
+  }
+
+
 }
