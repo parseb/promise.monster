@@ -19,6 +19,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     address public AAVE;
     uint256 public globalID;
 
+    mapping(bytes4 => bool) public caveat;
     /// @notice stores IDs for address' relevant promises [historical]
     /// first item is reserved for soulbinding token
     mapping(address => uint256[]) hasOrIsPromised;
@@ -49,13 +50,17 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     //     Asset
     // }
 
+    
+
 
     struct Promise {
         Standing state; /// lifecycle state
         uint256 liableID; /// liable soul
         address claimOwner; /// creditor
-        SignedDelegation content; /// signed delegation
         uint256[2] times; /// executable within timeframe [starting with | until].
+        SignedDelegation delegation; /// signed delegation
+        bytes4 fxSelector;
+        bytes args;
     }
 
     struct Asset {
@@ -67,6 +72,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     constructor() {
         AAVE = address(bytes20("placeholder"));
         globalID = 11;
+        _caveatInit();
     }
 
     //// Errors
@@ -74,13 +80,14 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     error Blasphemy();
     error UnpassableBuck();
     error SoullessMachine();
+    error Unreachable();
     ///// Events
 
-    event idIncremented();
-    event newSoulAcquired(address indexed who, uint256 indexed soulID);
-    event burdenTransfer(uint256 indexed claim, uint256 indexed destinationSoul);
-    event assetTokenCreated(address contractAsset, uint quantity, address assetOwner);
-
+    event IDincremented();
+    event NewSoulAcquired(address indexed who, uint256 indexed soulID);
+    event BurdenTransfer(uint256 indexed claim, uint256 indexed destinationSoul);
+    event AssetTokenCreated(address contractAsset, uint quantity, address assetOwner);
+    event MintedPromise(address indebted, address honored, uint tokenID);
     //// Modifiers
 
     /// @notice modifier checks the sender has
@@ -102,7 +109,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
             _incrementID();
         }
         _mint(msg.sender, globalID);
-        emit newSoulAcquired(msg.sender, globalID);
+        emit NewSoulAcquired(msg.sender, globalID);
 
         return globalID;
     }
@@ -134,14 +141,15 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
 
         _mint(to_, globalID);
 
-        emit assetTokenCreated(contract_, howmuch_, to_);
+        emit AssetTokenCreated(contract_, howmuch_, to_);
         
     }
 
     /// @notice burns asset token, transfers underlying to specified address or sender
     /// @param assetID_: ID of token
+    /// @param to_: address to transfer the underlying to. if 0x0 new ower will be _msgSender();
     function burnAsset(uint assetID_, address to_) external returns (bool s){
-        require( ownerOf(assetID_) == _msgSender(), '--Unauthorized');
+        require( ownerOf(assetID_) == _msgSender(), 'Unauthorized');
 
         if (to_ == address(0)) to_ = _msgSender();
         Asset memory A = assetToken[assetID_];
@@ -155,25 +163,51 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         _burn(assetID_);
     }  
 
+    function mintPromisedView(address logicContract, bytes calldata call_) external returns (bool s) {
+        require(address(logicContract).code.length > 1, 'Not a contract');
+        (s,) = logicContract.call(call_);
+
+        /// if on invoke s != true - alter soul
+    }
+
     /// @notice mints promise 
     /// @param to_: who is being promised
-    /// @param promise_: what is being promised 
-    function mintPromise(address to_, bytes memory promise_) external isSoul returns (uint256) {
+    /// @param delegation_: what is being delegated / promised 
+    function mintPromise( SignedDelegation memory delegation_, address to_, bytes4 selector, bytes memory args, uint[2] memory times_) external isSoul returns (uint256 pID) {
+        require(to_ == delegation_.delegation.delegate, "to_ is not delegated");
+        require(msg.sender == verifyDelegationSignature(delegation_), "not your signed delegation");
         Promise memory newP;
+
+        // struct Promise {
+        //     Standing state; /// lifecycle state
+        //     uint256 liableID; /// liable soul
+        //     address claimOwner; /// creditor
+        //     uint256[2] times; /// executable within timeframe [starting with | until].
+        //     SignedDelegation delegation; /// signed delegation
+        //     bytes4 fxSelector;
+        //     bytes args;
+        // }
+
         newP.state = Standing.Created;
-        newP.liableID = getSoulID(msg.sender); 
-        uint pID = _incrementID();
+        newP.liableID = getSoulID(msg.sender);
+        newP.claimOwner = to_;
+        newP.delegation = delegation_;
+        newP.fxSelector = selector;
+        newP.args = args;
+
+        pID = _incrementID();
         if (pID % 10 == 0 ) pID +=1;
         if (pID % 2 != 0) pID += 1; /// @dev 
-
-        
         globalID = pID;
         
         hasOrIsPromised[_msgSender()].push(pID);
         if (hasOrIsPromised[to_].length == 0) hasOrIsPromised[to_].push(0);
         hasOrIsPromised[to_].push(pID);
-
         getPromise[pID] = newP;
+
+        _mint(to_, pID);
+
+        emit MintedPromise(msg.sender, to_, pID);
     }
 
     function executePromise() external returns (bool) {
@@ -188,7 +222,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         unchecked {
             ++globalID;
         }
-        emit idIncremented();
+        emit IDincremented();
         return globalID;
     }
 
@@ -207,8 +241,8 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
 
     //// View
 
-    function getSoulID(address eoa_) public view returns (uint256) {
-        return hasOrIsPromised[eoa_][0];
+    function getSoulID(address eoa_) public view returns (uint256 id) {
+        id = hasOrIsPromised[eoa_].length == 0 ? 0 : hasOrIsPromised[eoa_][0];
     }
 
     function getPromiseHistory() public view {}
@@ -242,7 +276,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
             /// add claimed burden to soul
             hasOrIsPromised[msg.sender].push(tokenId);
 
-            emit burdenTransfer(tokenId, toSoul);
+            emit BurdenTransfer(tokenId, toSoul);
         } else {
             /// soulbound
             revert Blasphemy();
@@ -259,31 +293,28 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
                 // Load the 32 bytes word from memory with the address on the lower 20 bytes, and mask those.
                 sender := and(mload(add(array, index)), 0xffffffffffffffffffffffffffffffffffffffff)
             }
+            
+            if ( caveat[bytes4(msg.data[0:4])] ) revert Unreachable();
         } else {
             sender = msg.sender;
         }
+
         return sender;
     }
 
-    function enforceCaveat(
-        bytes calldata terms,
-        Transaction calldata transaction,
-        bytes32 delegationHash
-     ) public pure returns (bool) {
-    // Owner methods are not delegatable in this contract:
-    bytes4 targetSig = bytes4(transaction.data[0:4]);
-
-    // transferOwnership(address newOwner)
-    require(targetSig != 0xf2fde38b, "transferOwnership is not delegatable");
-
-    // renounceOwnership() 
-    require(targetSig != 0x79ba79d8, "renounceOwnership is not delegatable");
-
-    // 3fb89d84  =>  mintPromise(address,bytes)  
-    require(targetSig != 0x3fb89d84, "cannot promise");
-
-    return true;
-  }
+    function _caveatInit() private {
+        caveat[this.mintSoul.selector] = true;
+        caveat[this.mintPromise.selector] = true;
+        caveat[this.getSoulID.selector] = true;
+        caveat[this.getPromiseHistory.selector] = true;
+        caveat[this.getSoulRecord.selector] = true;
+        caveat[this.mintSoul.selector] = true;
+        caveat[this.approve.selector] = true;
+        caveat[this.setApprovalForAll.selector] = true;
+        caveat[this.transferFrom.selector] = true;
+        caveat[0x42842e0e] = true;
+        caveat[0xb88d4fde] = true;
+    }
 
 
 }
