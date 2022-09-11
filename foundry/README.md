@@ -2,17 +2,17 @@
 
 ### Life and Aspirations of a Promise
 
+### TODO
+- batch / composable array of promises (dao-dao || coibase->makerDAO proposal)
+
+
 #### States
 - Created
-- Active
 - Honoured
 - Broken
-- Indeterminate
+- Expired
 
-#### Events
-- Issued
-- Updated
-- Settled
+
 
 #### Possible Types
 - Free Floating - Transferable - Becomes Active on first transfer
@@ -25,8 +25,8 @@
 ## End goal success conditions
 
 ### Success Use Case 1: Simple Promise
-- I promise `Contract.fx()` will return true.
-- I promise to Yeet
+- I promise `Contract.fx()` will return true. (all)
+- I promise to Yeet (to be explored. not in scope but very appealing pattern)
 
 
 ### Success Use Case 2: Trusted NFT Loan

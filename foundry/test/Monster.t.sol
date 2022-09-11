@@ -59,8 +59,8 @@ contract MonsterTest is Test {
     /// can create ERC20 Asset
     function testCreateERC20Asset() public {
         vm.startPrank(GREEN, GREEN);
-        assertTrue(mToken.approve(address(PM), 1000*10**18));
-        bool t = PM.makeAsset(address(mToken), 1, 10**18, address(0));
+        assertTrue(mToken.approve(address(PM), 1000 * 10 ** 18));
+        bool t = PM.makeAsset(address(mToken), 1, 10 ** 18, address(0));
         assertTrue(t);
         vm.stopPrank();
         assertTrue(PM.balanceOf(GREEN) >= 1);
@@ -71,22 +71,22 @@ contract MonsterTest is Test {
         vm.startPrank(GREEN, GREEN);
         mNFT.approve(address(PM), mNFT.tokenID());
         PM.makeAsset(address(mNFT), 2, mNFT.tokenID(), address(0));
-        assertTrue(mNFT.balanceOf(address(PM))> 0 );
+        assertTrue(mNFT.balanceOf(address(PM)) > 0);
         vm.stopPrank();
         assertTrue(PM.balanceOf(GREEN) >= 1);
     }
 
     function testBurnsAsset() public {
         vm.startPrank(GREEN, GREEN);
-        
+
         mNFT.approve(address(PM), mNFT.tokenID());
         PM.makeAsset(address(mNFT), 2, mNFT.tokenID(), address(0));
-        PM.burnAsset(PM.globalID(), address(0)) ;   
+        PM.burnAsset(PM.globalID(), address(0));
 
-        assertTrue(mToken.approve(address(PM), 1000*10**18));
-        bool t = PM.makeAsset(address(mToken), 1, 10**18, address(0));
+        assertTrue(mToken.approve(address(PM), 1000 * 10 ** 18));
+        bool t = PM.makeAsset(address(mToken), 1, 10 ** 18, address(0));
         assertTrue(t);
-        PM.burnAsset(PM.globalID(), address(0));   
+        PM.burnAsset(PM.globalID(), address(0));
 
         vm.stopPrank();
     }
@@ -95,7 +95,7 @@ contract MonsterTest is Test {
         vm.startPrank(GREEN, GREEN);
         mNFT.approve(address(PM), mNFT.tokenID());
         PM.makeAsset(address(mNFT), 2, mNFT.tokenID(), address(79));
-        assertTrue(mNFT.balanceOf(address(PM))> 0 );
+        assertTrue(mNFT.balanceOf(address(PM)) > 0);
         vm.stopPrank();
         assertTrue(PM.balanceOf(address(79)) >= 1);
     }
@@ -108,30 +108,28 @@ contract MonsterTest is Test {
         PM.makeAsset(address(mNFT), 2, 2345, address(79));
 
         assertTrue(PM.ownerOf(PM.globalID()) == address(79), "not owner");
-        uint id = PM.globalID();
-        vm.prank(address(79),address(79));
-        PM.burnAsset(id, address(1)) ;   
-        
+        uint256 id = PM.globalID();
+        vm.prank(address(79), address(79));
+        PM.burnAsset(id, address(1));
+
         vm.startPrank(GREEN, GREEN);
-        assertTrue(mToken.approve(address(PM), 1000*10**18));
-        bool t = PM.makeAsset(address(mToken), 1, 10**18, address(79));
+        assertTrue(mToken.approve(address(PM), 1000 * 10 ** 18));
+        bool t = PM.makeAsset(address(mToken), 1, 10 ** 18, address(79));
         assertTrue(t);
 
         vm.stopPrank();
         id = PM.globalID();
         assertTrue(PM.ownerOf(id) == address(79));
         vm.prank(address(79), address(79));
-        PM.burnAsset(id, address(0));   
-
+        PM.burnAsset(id, address(0));
     }
 
-    
+    function testPromiseMintAssetTo() public {}
 
     // function testCheckIntuition(uint x) public {
     //     vm.assume(x > 10);
     //     vm.assume(x < 100000000000);
     //     assertTrue(  (( x % 2) ) == 0, "FFF" );
     //     assertTrue( ( x % 10) !=0 , "ZZ");
-    // } 
-
+    // }
 }

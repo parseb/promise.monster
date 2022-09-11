@@ -12,14 +12,45 @@ import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "delegatable-sol/Delegatable.sol";
 import "delegatable-sol/TypesAndDecoders.sol";
 
-
 //import "aave-v3-core/contracts/interfaces/.... .sol"
+
+struct Promise {
+    Standing state;
+    /// lifecycle state
+    uint256 liableID;
+    /// liable soul
+    address claimOwner;
+    /// creditor
+    uint256[2] times;
+    /// executable within timeframe [starting with | until].
+    SignedDelegation delegation;
+    /// signed delegation
+    bytes callData;
+}
+/// encoded function call() data
+
+struct Asset {
+    uint256 howMuch;
+    /// type 2: (NFT) id of token | type 1: (ERC20)
+    address tokenAddress;
+    uint8 assetType;
+}
+
+enum Standing {
+    Created,
+    Honored,
+    Broken,
+    Expired
+}
 
 contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable("Promise.Monster", "1") {
     address public AAVE;
+    address deployer;
     uint256 public globalID;
 
-    mapping(bytes4 => bool) public caveat;
+    /// @notice promise function allowlist
+    mapping(bytes4 => bool) caveat;
+
     /// @notice stores IDs for address' relevant promises [historical]
     /// first item is reserved for soulbinding token
     mapping(address => uint256[]) hasOrIsPromised;
@@ -34,61 +65,43 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     /// @dev might not be needed since record and association is present in hasOrIsPromised;
 
     /// @notice registers asset bearing token
-    mapping(uint => Asset) assetToken;
+    mapping(uint256 => Asset) assetToken;
 
-    enum Standing {
-        Created,
-        Active,
-        Honored,
-        Broken,
-        Indeterminate
-    }
-
-    // enum TokenType {
-    //     Promise,
-    //     Soul,
-    //     Asset
-    // }
-
-    
-
-
-    struct Promise {
-        Standing state; /// lifecycle state
-        uint256 liableID; /// liable soul
-        address claimOwner; /// creditor
-        uint256[2] times; /// executable within timeframe [starting with | until].
-        SignedDelegation delegation; /// signed delegation
-        bytes4 fxSelector;
-        bytes args;
-    }
-
-    struct Asset {
-        uint256 howMuch;
-        address tokenAddress;
-        uint8 assetType;
-    }
+    /*//////////////////////////////////////////////////////////////
+                        Constructor
+    //////////////////////////////////////////////////////////////*/
 
     constructor() {
         AAVE = address(bytes20("placeholder"));
         globalID = 11;
         _caveatInit();
+        deployer = msg.sender;
     }
 
-    //// Errors
+    /*//////////////////////////////////////////////////////////////
+                        Errors
+    //////////////////////////////////////////////////////////////*/
 
     error Blasphemy();
     error UnpassableBuck();
     error SoullessMachine();
     error Unreachable();
-    ///// Events
+
+    /*//////////////////////////////////////////////////////////////
+                        Events
+    //////////////////////////////////////////////////////////////*/
 
     event IDincremented();
     event NewSoulAcquired(address indexed who, uint256 indexed soulID);
     event BurdenTransfer(uint256 indexed claim, uint256 indexed destinationSoul);
-    event AssetTokenCreated(address contractAsset, uint quantity, address assetOwner);
-    event MintedPromise(address indebted, address honored, uint tokenID);
-    //// Modifiers
+    event AssetTokenCreated(address contractAsset, uint256 quantity, address assetOwner);
+    event MintedPromise(address indebted, address honored, uint256 tokenID);
+    event BrokenPromise(uint256 pID);
+    event KeptPromise(uint256 pID);
+
+    /*//////////////////////////////////////////////////////////////
+                        Modifiers
+    //////////////////////////////////////////////////////////////*/
 
     /// @notice modifier checks the sender has
     modifier isSoul() {
@@ -96,12 +109,15 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         _;
     }
 
-    /// Public
+    /*//////////////////////////////////////////////////////////////
+                        Public
+    //////////////////////////////////////////////////////////////*/
 
     /// @notice permantently registers sender as indebtness capable soul
     function mintSoul() public returns (uint256) {
         if (!_isEOA()) {
-            revert SoullessMachine(); /// @dev contracts might have souls. don't know yet.
+            revert SoullessMachine();
+            /// @dev contracts might have souls. don't know yet.
         }
         require(hasOrIsPromised[msg.sender].length == 0 || hasOrIsPromised[msg.sender][0] == 0, "already owned");
         _incrementID();
@@ -114,94 +130,114 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         return globalID;
     }
 
+    /*//////////////////////////////////////////////////////////////
+                        External
+    //////////////////////////////////////////////////////////////*/
+
     /// @notice wraps assets in an ERC721 token
     /// @param contract_ address of the token contract
     /// @param howmuch_ quantity of ERC20 or ERC721 token ID
     function makeAsset(address contract_, uint8 assetType, uint256 howmuch_, address to_) external returns (bool s) {
         require(assetToken[globalID].tokenAddress == address(0), "Asset exists");
-        if (to_ == address(0)) to_ = _msgSender();
+        // address sender = msg.sender == address(this) ? _msgSender();
+        if (to_ == address(0)) {
+            to_ = _msgSender();
+        }
         globalID = incrementIDAsset();
         assetToken[globalID].tokenAddress = contract_;
         assetToken[globalID].assetType = assetType;
         assetToken[globalID].howMuch = howmuch_;
-        
-        uint balance;
+
+        uint256 balance;
 
         if (assetType == 1) {
-           balance = IERC20(contract_).balanceOf(address(this));
-           s = IERC20(contract_).transferFrom(_msgSender(),address(this), howmuch_); /// how much ERC20
-           if (s) s= (balance + howmuch_ <=  IERC20(contract_).balanceOf(address(this)));
-        } 
+            balance = IERC20(contract_).balanceOf(address(this));
+            s = IERC20(contract_).transferFrom(_msgSender(), address(this), howmuch_);
+            /// how much ERC20
+            if (s) {
+                s = (balance + howmuch_ <= IERC20(contract_).balanceOf(address(this)));
+            }
+        }
         if (assetType == 2) {
-           balance = IERC721(contract_).balanceOf(address(this));
-           IERC721(contract_).transferFrom(_msgSender(), address(this), howmuch_); /// tokenID ERC721
-           s= (balance < IERC721(contract_).balanceOf(address(this)));
+            balance = IERC721(contract_).balanceOf(address(this));
+            IERC721(contract_).transferFrom(_msgSender(), address(this), howmuch_);
+            /// tokenID ERC721
+            s = (balance < IERC721(contract_).balanceOf(address(this)));
         }
         require(s, "Failed to register asset");
 
         _mint(to_, globalID);
 
         emit AssetTokenCreated(contract_, howmuch_, to_);
-        
     }
 
     /// @notice burns asset token, transfers underlying to specified address or sender
     /// @param assetID_: ID of token
     /// @param to_: address to transfer the underlying to. if 0x0 new ower will be _msgSender();
-    function burnAsset(uint assetID_, address to_) external returns (bool s){
-        require( ownerOf(assetID_) == _msgSender(), 'Unauthorized');
+    function burnAsset(uint256 assetID_, address to_) external returns (bool s) {
+        require(ownerOf(assetID_) == msg.sender || msg.sender == address(this), "Unauthorized");
 
-        if (to_ == address(0)) to_ = _msgSender();
+        if (to_ == address(0)) {
+            to_ = _msgSender();
+        }
         Asset memory A = assetToken[assetID_];
-        if (A.assetType == 1) s= IERC20(A.tokenAddress).transfer(to_, A.howMuch);
-        if (! s) { 
+        if (A.assetType == 1) {
+            s = IERC20(A.tokenAddress).transfer(to_, A.howMuch);
+        }
+        if (!s) {
             IERC721(A.tokenAddress).transferFrom(address(this), to_, A.howMuch);
             s = IERC721(A.tokenAddress).ownerOf(A.howMuch) != address(this);
         }
         require(s, "Failed to Burn Asset");
         delete assetToken[assetID_];
         _burn(assetID_);
-    }  
-
-    function mintPromisedView(address logicContract, bytes calldata call_) external returns (bool s) {
-        require(address(logicContract).code.length > 1, 'Not a contract');
-        (s,) = logicContract.call(call_);
-
-        /// if on invoke s != true - alter soul
     }
 
-    /// @notice mints promise 
+    // function mintPromisedView(address logicContract, bytes calldata call_) external returns (bool s) {
+    //     require(address(logicContract).code.length > 1, 'Not a contract');
+    //     (s,) = logicContract.call(call_);
+    // }
+
+    /// @notice mints promise
     /// @param to_: who is being promised
-    /// @param delegation_: what is being delegated / promised 
-    function mintPromise( SignedDelegation memory delegation_, address to_, bytes4 selector, bytes memory args, uint[2] memory times_) external isSoul returns (uint256 pID) {
+    /// @param delegation_: what is being delegated / promised
+    function mintPromise(
+        SignedDelegation memory delegation_,
+        address to_,
+        bytes memory callData_,
+        uint256[2] memory times_
+    )
+        external
+        isSoul
+        returns (uint256 pID)
+    {
         require(to_ == delegation_.delegation.delegate, "to_ is not delegated");
         require(msg.sender == verifyDelegationSignature(delegation_), "not your signed delegation");
-        Promise memory newP;
+        require(!caveat[bytes4(callData_)], "unreachable function");
 
-        // struct Promise {
-        //     Standing state; /// lifecycle state
-        //     uint256 liableID; /// liable soul
-        //     address claimOwner; /// creditor
-        //     uint256[2] times; /// executable within timeframe [starting with | until].
-        //     SignedDelegation delegation; /// signed delegation
-        //     bytes4 fxSelector;
-        //     bytes args;
-        // }
+        Promise memory newP;
 
         newP.state = Standing.Created;
         newP.liableID = getSoulID(msg.sender);
         newP.claimOwner = to_;
         newP.delegation = delegation_;
-        newP.fxSelector = selector;
-        newP.args = args;
+        newP.callData = callData_;
+        newP.times = times_;
 
         pID = _incrementID();
-        if (pID % 10 == 0 ) pID +=1;
-        if (pID % 2 != 0) pID += 1; /// @dev 
+        if (pID % 10 == 0) {
+            pID += 1;
+        }
+        if (pID % 2 != 0) {
+            pID += 1;
+        }
+        /// @dev
         globalID = pID;
-        
+
         hasOrIsPromised[_msgSender()].push(pID);
-        if (hasOrIsPromised[to_].length == 0) hasOrIsPromised[to_].push(0);
+        if (hasOrIsPromised[to_].length == 0) {
+            hasOrIsPromised[to_].push(0);
+        }
         hasOrIsPromised[to_].push(pID);
         getPromise[pID] = newP;
 
@@ -210,15 +246,52 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         emit MintedPromise(msg.sender, to_, pID);
     }
 
-    function executePromise() external returns (bool) {
+    /// @notice executes a promise. sender needs to be the claim owner or delegated
+    /// @param promiseID: identifier of promise to execute
+    function executePromise(uint256 promiseID) external returns (bool s) {
+        Promise memory P;
+        P = getPromise[promiseID];
 
+        require(P.state == Standing.Created);
+        if (P.times[0] > block.timestamp) {
+            revert("soon");
+        }
+        require(msg.sender == P.claimOwner || msg.sender == P.delegation.delegation.delegate, "Not promised to you");
+        if (P.times[1] < block.timestamp) {
+            P.state = Standing.Expired;
+            return false;
+        }
+
+        delete getPromise[promiseID].delegation;
+
+        (s,) = address(this).call(P.callData);
+        if (s) {
+            P.state = Standing.Honored;
+            emit KeptPromise(promiseID);
+        } else {
+            P.state = Standing.Broken;
+            revert("FFF");
+            emit BrokenPromise(promiseID);
+        }
+        uint256 i;
+        for (; i < chainedSouls[promiseID].length;) {
+            hasOrIsPromised[chainedSouls[promiseID][i]].push(promiseID);
+            unchecked {
+                ++i;
+            }
+        }
+
+        _burn(promiseID);
+
+        /// @dev sufficient replay protection ?
     }
 
-    ///// Private
-
+    /*//////////////////////////////////////////////////////////////
+                        private
+    //////////////////////////////////////////////////////////////*/
 
     /// @notice increments global ID
-    function _incrementID() private returns (uint) {
+    function _incrementID() private returns (uint256) {
         unchecked {
             ++globalID;
         }
@@ -226,7 +299,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         return globalID;
     }
 
-    function incrementIDAsset() private returns (uint gid_) {
+    function incrementIDAsset() private returns (uint256 gid_) {
         gid_ = globalID + (10 - (globalID % 10));
     }
     //// @notice checks if sender is EOA
@@ -235,9 +308,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         return (msg.sender == tx.origin);
     }
 
-    function _tricklePromiseEndState(uint promiseID_) private {
-
-    }
+    function _tricklePromiseEndState(uint256 promiseID_) private {}
 
     //// View
 
@@ -245,17 +316,21 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         id = hasOrIsPromised[eoa_].length == 0 ? 0 : hasOrIsPromised[eoa_][0];
     }
 
+    function getPromiseByID(uint256 id_) external view returns (Promise memory P) {
+        P = getPromise[id_];
+    }
+
     function getPromiseHistory() public view {}
     function getSoulRecord() public view {}
-
 
     //////// Override
 
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal virtual override {
-        if (tokenId % 10 == 0) return; // token is asset
+        if (tokenId % 10 == 0) {
+            return;
+        } // token is asset
 
         if (from == address(0)) {
-            
             hasOrIsPromised[msg.sender].push(tokenId);
             return;
         }
@@ -265,6 +340,11 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
 
             if (getSoulID(msg.sender) == getPromise[tokenId].liableID) {
                 revert UnpassableBuck();
+            }
+
+            if (getPromise[tokenId].claimOwner == msg.sender) {
+                getPromise[tokenId].claimOwner = to;
+                return;
             }
             /// mints soul if none
             /// @dev @note contract might gain soul
@@ -283,7 +363,9 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         }
     }
 
-    /////////////
+    /*//////////////////////////////////////////////////////////////
+                        Misc
+    //////////////////////////////////////////////////////////////*/
 
     function _msgSender() internal view override (Context, DelegatableCore) returns (address sender) {
         if (msg.sender == address(this)) {
@@ -293,8 +375,9 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
                 // Load the 32 bytes word from memory with the address on the lower 20 bytes, and mask those.
                 sender := and(mload(add(array, index)), 0xffffffffffffffffffffffffffffffffffffffff)
             }
-            
-            if ( caveat[bytes4(msg.data[0:4])] ) revert Unreachable();
+            if (caveat[bytes4(msg.data[0:4])]) {
+                revert Unreachable();
+            }
         } else {
             sender = msg.sender;
         }
@@ -312,9 +395,20 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         caveat[this.approve.selector] = true;
         caveat[this.setApprovalForAll.selector] = true;
         caveat[this.transferFrom.selector] = true;
+        ///
         caveat[0x42842e0e] = true;
         caveat[0xb88d4fde] = true;
     }
 
+    /*//////////////////////////////////////////////////////////////
+                        Only deployer
+    //////////////////////////////////////////////////////////////*/
 
+    /// @notice adds, removes or flips caveats
+    /// @param sig: 4 byte signature of function to allow/dissalow list
+    function flipCaveat(bytes4 sig) external returns (bool) {
+        require(msg.sender == deployer);
+        caveat[sig] = !caveat[sig];
+        return caveat[sig];
+    }
 }
