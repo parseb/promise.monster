@@ -206,6 +206,26 @@ contract MonsterTest is Test {
             [block.timestamp, block.timestamp + 3245]
         );
 
+        //// urelated : test view function
+        Promise[] memory P = PM.getPromiseHistory(hasDelegation);
+        assertTrue(P.length == 0);
 
+
+        vm.prank(willDelegate,willDelegate);
+        PM.mintPromise(
+            signedD1,
+            hasDelegation,
+            abi.encodeWithSignature("RandFunction(address)", address(4354), true),
+            [block.timestamp, block.timestamp + 3245]
+        );
+
+        P = PM.getPromiseHistory(willDelegate);
+        assertTrue(P.length > 0);
+        assertFalse(P[2].state == Standing.Uninitialized); ///@dev potential duplication. retrace
+        console.log(PM.getSoulID(willDelegate));
+        console.log(P[1].liableID);
+
+        assertTrue(P[1].liableID == P[2].liableID ); /// @dev ^ take this
+        assertTrue(P[0].liableID == 0);
     }
 }

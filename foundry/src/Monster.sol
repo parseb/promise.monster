@@ -37,6 +37,7 @@ struct Asset {
 }
 
 enum Standing {
+    Uninitialized,
     Created,
     Honored,
     Broken,
@@ -125,8 +126,9 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
             _incrementID();
         }
         _mint(msg.sender, globalID);
-        emit NewSoulAcquired(msg.sender, globalID);
+        hasOrIsPromised[msg.sender][0] == globalID;
 
+        emit NewSoulAcquired(msg.sender, globalID);
         return globalID;
     }
 
@@ -210,15 +212,17 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         external
         isSoul
         returns (uint256 pID)
-    {
+    {   
+        address liable = verifyDelegationSignature(delegation_);
         require(to_ == delegation_.delegation.delegate, "to_ is not delegated");
-        require(msg.sender == verifyDelegationSignature(delegation_), "not your signed delegation");
+        require(msg.sender == liable, "not your signed delegation");
         require(!caveat[bytes4(callData_)], "unreachable function");
+        //// @dev ?promise resubmission check
 
         Promise memory newP;
 
         newP.state = Standing.Created;
-        newP.liableID = getSoulID(msg.sender);
+        newP.liableID = getSoulID(liable);
         newP.claimOwner = to_;
         newP.delegation = delegation_;
         newP.callData = callData_;
@@ -234,11 +238,10 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         /// @dev
         globalID = pID;
 
-        hasOrIsPromised[_msgSender()].push(pID);
-        if (hasOrIsPromised[to_].length == 0) {
-            hasOrIsPromised[to_].push(0);
-        }
-        hasOrIsPromised[to_].push(pID);
+        if ( hasOrIsPromised[to_].length == 0 )  hasOrIsPromised[to_].push(0);
+        hasOrIsPromised[liable].push(pID);
+
+
         getPromise[pID] = newP;
 
         _mint(to_, pID);
@@ -273,14 +276,8 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
             revert("FFF");
             emit BrokenPromise(promiseID);
         }
-        uint256 i;
-        for (; i < chainedSouls[promiseID].length;) {
-            hasOrIsPromised[chainedSouls[promiseID][i]].push(promiseID);
-            unchecked {
-                ++i;
-            }
-        }
 
+        _tricklePromiseEndState(promiseID);
         _burn(promiseID);
 
         /// @dev sufficient replay protection ?
@@ -308,22 +305,49 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         return (msg.sender == tx.origin);
     }
 
-    function _tricklePromiseEndState(uint256 promiseID_) private {}
+    /// @notice trickles promise state if liability transfered. @dev might lead to duplicates
+    function _tricklePromiseEndState(uint256 promiseID_) private {
+        uint256 i;
+        for (; i < chainedSouls[promiseID_].length;) {
+            hasOrIsPromised[chainedSouls[promiseID_][i]].push(promiseID_);
+            unchecked {
+                ++i;
+            }
+        }
+    }
 
-    //// View
+    /*//////////////////////////////////////////////////////////////
+                         View
+    //////////////////////////////////////////////////////////////*/
 
     function getSoulID(address eoa_) public view returns (uint256 id) {
         id = hasOrIsPromised[eoa_].length == 0 ? 0 : hasOrIsPromised[eoa_][0];
     }
 
-    function getPromiseByID(uint256 id_) external view returns (Promise memory P) {
+    function getPromiseByID(uint256 id_) public view returns (Promise memory P) {
         P = getPromise[id_];
     }
 
-    function getPromiseHistory() public view {}
+    function getPromiseHistory(address who_) external view returns (Promise[] memory) {
+        uint x = hasOrIsPromised[who_].length;
+
+        Promise[] memory P;
+        if (x < 2) return P;
+        P = new Promise[](x);
+        uint i = 1;
+        for(;i<x;) {
+            if (hasOrIsPromised[who_][i] == 0) continue;
+            P[i] = getPromiseByID(hasOrIsPromised[who_][i]);
+            unchecked { ++ i; }
+        }
+        return P;
+    }
+
     function getSoulRecord() public view {}
 
-    //////// Override
+    /*//////////////////////////////////////////////////////////////
+                        Override
+    //////////////////////////////////////////////////////////////*/
 
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal virtual override {
         if (tokenId % 10 == 0) {
@@ -352,7 +376,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
             /// liable for promise
             getPromise[tokenId].liableID = globalID;
             /// shared moral responsibility
-            chainedSouls[tokenId].push(msg.sender);
+            chainedSouls[tokenId].push(msg.sender); /// @dev potential trickle state duplication
             /// add claimed burden to soul
             hasOrIsPromised[msg.sender].push(tokenId);
 
