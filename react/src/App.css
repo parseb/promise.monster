@@ -3,11 +3,19 @@
 }
 
 body {
-  background-color: lightslategray;
+  background-color: #D6CF89;
 }
 
 .logo-text {
-  color: white
+  color: #DA0DDD;
+  font-family:'Courier New', Courier, monospace;
+  font-weight: 600;
+  font-size:xxx-large
+
+}
+
+.monster-text {
+  font-size: 60px;
 }
 
 .main-container {
@@ -15,5 +23,16 @@ body {
 }
 
 .about-description {
-  color: white;
+  color:#251F27;
 }
+
+.color-green {
+  color: #33562A;
+}
+
+.color-cyan {
+  color: #75E3CF
+}
+
+/* #33562A
+#8CBC96 */
