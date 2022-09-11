@@ -10,12 +10,13 @@ body {
   color: #DA0DDD;
   font-family:'Courier New', Courier, monospace;
   font-weight: 600;
-  font-size:xxx-large
+  font-size:xx-large
 
 }
 
 .monster-text {
-  font-size: 60px;
+  font-size: 100px;
+  margin-bottom:40px;
 }
 
 .main-container {
@@ -32,6 +33,29 @@ body {
 
 .color-cyan {
   color: #75E3CF
+}
+
+hr.landing {
+  size: 10px;
+  height: 10px;
+  color: #75E3CF;
+  margin-bottom: -10px;
+  margin-top: 6px;
+
+}
+
+.about-description {
+  color: #DA0DDD;
+  font-family:'Courier New', Courier, monospace;
+  font-weight: 600;
+  font-size:x-large
+}
+
+.landing-description-paragraph {
+  color: #33562A;
+  font-family:'Courier New', Courier, monospace;
+  font-size: 40px;
+
 }
 
 /* #33562A
