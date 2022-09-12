@@ -17,6 +17,8 @@ body {
 .monster-text {
   font-size: 100px;
   margin-bottom:40px;
+  position: relative;
+  top: -23px;
 }
 
 .main-container {
@@ -51,11 +53,21 @@ hr.landing {
   font-size:x-large
 }
 
-.landing-description-paragraph {
+p.landing-description-paragraph {
+  margin-top: 30px;
   color: #33562A;
   font-family:'Courier New', Courier, monospace;
-  font-size: 40px;
+  font-size: 24px;
+  text-align: left;
 
+}
+
+.loginbtn-col {
+  margin-top: 30px;
+}
+
+button.btn-connect:hover {
+  color: whitesmoke !important;
 }
 
 /* #33562A

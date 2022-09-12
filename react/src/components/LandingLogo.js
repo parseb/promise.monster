@@ -50,7 +50,7 @@ function LandingLogo() {
             <hr className="landing"/>
 
         <br/>
-        <h2 className='logo-text text-center'>_promise <span className='monster-text'>👾</span> monster_</h2>
+        <h2 className='logo-text text-center'>_promise<span className='monster-text'>👾</span>monster_</h2>
             <hr className="landing"/>
             <hr className="landing"/>
             <hr className="landing"/>

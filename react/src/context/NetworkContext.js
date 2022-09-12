@@ -1,9 +1,9 @@
 
 
-export const getPMAddress = async (web3) => {
-    const chainID = await web3.provider.chainId;
-    const chainAddresses = {
+export const getPMAddress =  {
         1: {},
+        5: {PMaddress: ""},
+
 
         10:{
             PMaddress: ""
@@ -19,10 +19,6 @@ export const getPMAddress = async (web3) => {
         136: {}
       }
 
-      return chainAddresses[chainID].PMaddress;
-}
 
-export const getPMabi = () => {
-    const abi=[]
-    return abi
-}
+export const PMabi = [];
+
