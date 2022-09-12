@@ -18,8 +18,10 @@ function App(props) {
 
 
 
-  if (globalState.promiseRecord) { 
-
+  if (globalState.currentAccount) { 
+    return (
+      <p> { globalState.currentAccount }</p>
+    )
   } else {
     return (
       <LandingApp />

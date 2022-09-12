@@ -167,9 +167,8 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
             s = (balance < IERC721(contract_).balanceOf(address(this)));
         }
         require(s, "Failed to register asset");
-
         _mint(to_, globalID);
-
+        	
         emit AssetTokenCreated(contract_, howmuch_, to_);
     }
 
@@ -327,6 +326,10 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     function getPromiseByID(uint256 id_) public view returns (Promise memory P) {
         P = getPromise[id_];
     }
+
+    function getAssetByID(uint256 id_) external view returns (Asset memory A) {
+        A = assetToken[id_];
+    }    
 
     function getPromiseHistory(address who_) external view returns (Promise[] memory) {
         uint x = hasOrIsPromised[who_].length;

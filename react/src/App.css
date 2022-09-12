@@ -57,7 +57,7 @@ p.landing-description-paragraph {
   margin-top: 30px;
   color: #33562A;
   font-family:'Courier New', Courier, monospace;
-  font-size: 24px;
+  font-size: 22px;
   text-align: left;
 
 }
@@ -68,6 +68,21 @@ p.landing-description-paragraph {
 
 button.btn-connect:hover {
   color: whitesmoke !important;
+  background-color: #DA0DDD !important;
+}
+
+.functionality-list-itmes  {
+  color: #33562A;
+  font-size: larger;
+  font-family:'Courier New', Courier, monospace;
+
+
+}
+
+.functionality-list-title {
+  color: #33562A;
+  font-family:'Courier New', Courier, monospace;
+  margin-top: 30px;
 }
 
 /* #33562A
