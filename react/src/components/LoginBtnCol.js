@@ -13,7 +13,8 @@ import { useGlobalState } from "../context/GlobalState.js"
 
             const provider = new ethers.providers.Web3Provider(window.ethereum)
             const accounts = await provider.send("eth_requestAccounts", []);
-            const chainId = await provider.chainId;
+            const network = await provider.getNetwork();
+            const chainId = network.chainId;
             const signer = provider.getSigner()
 
             const pmAddr = getPMAddress[parseInt(chainId)];
@@ -21,11 +22,10 @@ import { useGlobalState } from "../context/GlobalState.js"
             console.log(accounts[0], pmAddr);
             
             updateGlobalState("currentAccount", accounts[0]);
-            updateGlobalState("PMcontract", pmAddr);
+            updateGlobalState("PMaddr", pmAddr);
             updateGlobalState("signer", signer);
             updateGlobalState("chainId", chainId);
-
-            console.log(globalState.signer);
+            
         }
     
     return(

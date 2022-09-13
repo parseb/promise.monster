@@ -54,12 +54,11 @@ hr.landing {
 }
 
 p.landing-description-paragraph {
-  margin-top: 30px;
+  margin-top: 90px;
   color: #33562A;
   font-family:'Courier New', Courier, monospace;
   font-size: 22px;
   text-align: left;
-
 }
 
 .loginbtn-col {
@@ -83,6 +82,24 @@ button.btn-connect:hover {
   color: #33562A;
   font-family:'Courier New', Courier, monospace;
   margin-top: 30px;
+}
+
+@counter-style repeating-emoji {
+  system: cyclic;
+  symbols: "\1F47e";
+  suffix: " ";
+}
+
+/* li:marker {
+  list-style-image: url("https://emojipedia-us.s3.amazonaws.com/source/microsoft-teams/337/alien-monster_1f47e.png")
+} */
+
+ul li::marker {
+  content: "-👾-";
+}
+
+ul li.alien {
+  text-align: left !important;
 }
 
 /* #33562A

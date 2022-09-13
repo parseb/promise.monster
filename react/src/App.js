@@ -4,7 +4,7 @@ import './App.css';
 
 import React, { useEffect } from 'react';
 import LandingApp from './components/LandingApp';
-
+import MainComponent from './components/MainComponent';
 import {useGlobalState} from "./context/GlobalState.js"
 
 
@@ -18,9 +18,11 @@ function App(props) {
 
 
 
-  if (globalState.currentAccount) { 
+  if (sessionStorage.currentAccount) { 
     return (
-      <p> { globalState.currentAccount }</p>
+      <div className='container'>
+        <MainComponent />
+      </div>
     )
   } else {
     return (

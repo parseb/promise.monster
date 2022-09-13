@@ -20,7 +20,9 @@ export const GlobalState = props => {
   // create a function that'll make it easy to update one state property at a time
   const updateGlobalState = (key, newValue) => {
     setGlobalState(oldState => {
+
       if (oldState[key] !== newValue) {
+        sessionStorage.setItem(key,newValue);
         const newState = { ...oldState }
         newState[key] = newValue
         return newState
