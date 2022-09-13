@@ -168,7 +168,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         }
         require(s, "Failed to register asset");
         _mint(to_, globalID);
-        	
+
         emit AssetTokenCreated(contract_, howmuch_, to_);
     }
 
@@ -211,7 +211,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         external
         isSoul
         returns (uint256 pID)
-    {   
+    {
         address liable = verifyDelegationSignature(delegation_);
         require(to_ == delegation_.delegation.delegate, "to_ is not delegated");
         require(msg.sender == liable, "not your signed delegation");
@@ -237,9 +237,10 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         /// @dev
         globalID = pID;
 
-        if ( hasOrIsPromised[to_].length == 0 )  hasOrIsPromised[to_].push(0);
+        if (hasOrIsPromised[to_].length == 0) {
+            hasOrIsPromised[to_].push(0);
+        }
         hasOrIsPromised[liable].push(pID);
-
 
         getPromise[pID] = newP;
 
@@ -329,21 +330,46 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
 
     function getAssetByID(uint256 id_) external view returns (Asset memory A) {
         A = assetToken[id_];
-    }    
+    }
 
-    function getPromiseHistory(address who_) external view returns (Promise[] memory) {
-        uint x = hasOrIsPromised[who_].length;
+    function getPromiseHistory(address who_) public view returns (Promise[] memory) {
+        uint256 x = hasOrIsPromised[who_].length;
 
         Promise[] memory P;
-        if (x < 2) return P;
+        if (x < 2) {
+            return P;
+        }
         P = new Promise[](x);
-        uint i = 1;
-        for(;i<x;) {
-            if (hasOrIsPromised[who_][i] == 0) continue;
+        uint256 i = 1;
+        for (; i < x;) {
+            if (hasOrIsPromised[who_][i] == 0) {
+                continue;
+            }
             P[i] = getPromiseByID(hasOrIsPromised[who_][i]);
-            unchecked { ++ i; }
+            unchecked {
+                ++i;
+            }
         }
         return P;
+    }
+
+    /// @notice  returns two arrays of Promises (liabilities, assets)
+    /// @param who_: for  what address to return associated promises
+    function getLiabilitiesAssetsFor(address who_) external view returns (Promise[] memory Pl, Promise[] memory Pa) {
+        Pl = getPromiseHistory(who_);
+        uint256 len = Pl.length;
+        Pa = new  Promise[](len);
+        uint256 i;
+        for (; i < len;) {
+            if (Pl[i].claimOwner == who_) {
+                Pa[i] = Pl[i];
+                delete Pl[i];
+            }
+            unchecked {
+                ++i;
+            }
+        }
+        return (Pl, Pa);
     }
 
     function getSoulRecord() public view {}
@@ -379,7 +405,8 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
             /// liable for promise
             getPromise[tokenId].liableID = globalID;
             /// shared moral responsibility
-            chainedSouls[tokenId].push(msg.sender); /// @dev potential trickle state duplication
+            chainedSouls[tokenId].push(msg.sender);
+            /// @dev potential trickle state duplication
             /// add claimed burden to soul
             hasOrIsPromised[msg.sender].push(tokenId);
 

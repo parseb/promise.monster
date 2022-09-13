@@ -187,14 +187,14 @@ contract MonsterTest is Test {
 
         vm.prank(hasDelegation);
         vm.expectRevert("unreppenting soul");
-        uint promiseId = PM.mintPromise(
+        uint256 promiseId = PM.mintPromise(
             signedD1,
             hasDelegation,
             abi.encodeWithSignature("setApprovalForAll(address,bool)", address(4354), true),
             [block.timestamp, block.timestamp + 3245]
         );
 
-        vm.prank(willDelegate,willDelegate);
+        vm.prank(willDelegate, willDelegate);
         PM.mintSoul();
 
         vm.prank(willDelegate);
@@ -210,8 +210,7 @@ contract MonsterTest is Test {
         Promise[] memory P = PM.getPromiseHistory(hasDelegation);
         assertTrue(P.length == 0);
 
-
-        vm.prank(willDelegate,willDelegate);
+        vm.prank(willDelegate, willDelegate);
         PM.mintPromise(
             signedD1,
             hasDelegation,
@@ -221,11 +220,14 @@ contract MonsterTest is Test {
 
         P = PM.getPromiseHistory(willDelegate);
         assertTrue(P.length > 0);
-        assertFalse(P[2].state == Standing.Uninitialized); ///@dev potential duplication. retrace
+        assertFalse(P[2].state == Standing.Uninitialized);
+        ///@dev potential duplication. retrace
         console.log(PM.getSoulID(willDelegate));
         console.log(P[1].liableID);
 
-        assertTrue(P[1].liableID == P[2].liableID ); /// @dev ^ take this
+        assertTrue(P[1].liableID == P[2].liableID);
+
+        /// @dev ^ take this
         assertTrue(P[0].liableID == 0);
     }
 }
