@@ -1,64 +1,45 @@
 import { Button } from 'react-bootstrap';
 import { ethers, Contract, utils } from 'ethers';
-import { useGlobalState } from "../context/GlobalState.js"
 import  { getPMAddress, PMabi } from '../context/NetworkContext';
 
 import TopBar from "./TopBar";
-import { useEffect, useState } from 'react';
 
               
-    function MainComponent(props) {
-        
-        const [globalState, updateGlobalState] = useGlobalState();
-        const [promises, setPromises] = useState([]);
+    class MainComponent extends React.Component {
 
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
-        // const accounts = await provider.send("eth_requestAccounts", []);
-        const network = provider.getNetwork();
-        const chainId = network.chainId;
-        // const signer = provider.getSigner()
-        const PMaddr = getPMAddress[5];
+        constructor(props) {
+            super(props);
+            this.state = {
+                currentAccount: sessionStorage.currentAccount,
+                promises:[]
+            }
+        }
         
-        console.log(PMaddr);
-        // const PMread = new ethers.Contract(
-        //     sessionStorage.PMcontract,
-        //     PMabi,
-        //     provider
-        // );
 
-        useEffect( () => {
-            const contract = new Contract(
+        render() {
+
+    
+            const provider = new ethers.providers.Web3Provider(window.ethereum)
+            // const accounts = await provider.send("eth_requestAccounts", []);
+            const network = provider.getNetwork();
+            const chainId = network.chainId;
+            // const signer = provider.getSigner()
+            const PMaddr = getPMAddress[5];
+            const PMread = new Contract(
                 sessionStorage.PMaddr,
                 PMabi,
                 provider
               );
-            contract.getLiabilitiesAssetsFor(sessionStorage.currentAccount)
-              .then(response => JSON.stringify(response))
-              .then((response) => updateGlobalState('promises', response));
-              console.log(promises);
-  
-         
-        })
+            
+            PMread.getLiabilitiesAssetsFor(sessionStorage.currentAccount)
+                .then((response) => {
+                  sessionStorage.setItem('promises', [response]);
+                  console.log(response);
+                });
 
-        // const fetchPromises = async () => {
-        //     const promises = await UserPromises(
-        //         provider,
-        //         sessionStorage.currentAccount,
-        //         PMaddr
-        //     )
-        //         console.log("this gets executed");
-        //     if (promises) {
-        //       updateGlobalState('promises', promises);
-        //       console.log(promises);
-        //     } else {
-          
-        //     }
-        //   };
-        //   fetchPromises();
-
-    return(
-        <>
-        <TopBar promises= {globalState.promises}/>
+            return (
+                <>
+        <TopBar pros={this.state.promises}/>
         <div className='row'>
          <p>
     
@@ -66,7 +47,9 @@ import { useEffect, useState } from 'react';
 
         </div>
         </>
-    )
+            );
+        }
+       
     }
             
 
