@@ -54,7 +54,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
 
     /// @notice stores IDs for address' relevant promises [historical]
     /// first item is reserved for soulbinding token
-    mapping(address => uint256[]) hasOrIsPromised;
+    mapping(address => uint256[]) public hasOrIsPromised;
 
     /// @notice stores the address of a claim
     mapping(uint256 => Promise) getPromise;

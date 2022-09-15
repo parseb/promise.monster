@@ -36,7 +36,7 @@ import { useGlobalState } from "../context/GlobalState.js"
                 <br />
                 <hr className="landing-2"/>
                 <span className='current-address'>
-                 | 🧍:{ sessionStorage.getItem("currentAccount") } 
+                 |🧍:{ sessionStorage.getItem("currentAccount") } 
                 </span>
             </div>
             <div className='col-2'>
