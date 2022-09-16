@@ -17,73 +17,117 @@
 
 <body>
   <title>promise 👾</title>
+  <div class="container top-container" id="topContainer">
+    <div class="container landing-container d-none" id="landingPage">
+      <br>
 
-  <div class="container main-container" id="landingContainer">
-    <br>
+      <div class="logo-landing">
+        <div class="row">
+          <div class="col-3">
 
-    <div class="logo-landing">
-      <div class="row">
-        <div class="col-3">
-
-        </div>
-        <div class="col-6">
-          
-          
-          <br>
-          <h2 class="logo-text text-center">_promise<span class="monster-text">👾</span>monster_</h2>
-          
-
-        </div>
-        <div class="col-3">
-          
-        </div>
-      </div><br>
-    </div>
-    <div>
-      <h6 class="about-description">A tool for crafting and executing conditional promises between two or more parties
-      </h6>
-    </div>
-    
-    <div class="row">
-      <div class="col-6">
-        <p class="landing-description-paragraph">This is a guided interface to demonstrate in part the capabilities and
-          tangible ambitions of the underlying immutable logic circuit as encoded in the <a
-            href="https://github.com/parseb/promise.monster/blob/master/foundry/src/Monster.sol">PromiseMonster</a>
-          smart contract.<br><b>Promises</b> are a core primitive in institution building and abstracted coordination.
-          This is an experiment and now one of the ways of using promises to constitute a permissionless promise
-          awarding and executing process.</p>
-      </div>
-      <div class="col-6">
-        <div>
-          <div>
-            <h4 class="functionality-list-title">Some of the Features:</h4><br>
-            <ul class="functionality-list-itmes">
-              <li>Liable entities carry reputation under the form of a address-bounded token</li>
-              <li>Promises are transferable ERC721s and refer to timeframe specific or not future transactions</li>
-              <li>Promises can be made with respect to any asset. Internally an asset is an ERC721 that wraps any other
-                given ERC721 or ERC20 asset.</li>
-              <li><b>To recap:</b> Promises are NFTs, mostly delegations of future claims to any wrapped arbitrary
-                asset. They are transferable and potentially valuable.</li>
-            </ul>
           </div>
-          <div class="loginbtn-col"><button type="button" class="btn btn-outline-secondary btn-connect btn-lg" id="connectBtn" onclick="onConnect()">Browser
-              Wallet Login</button></div>
+          <div class="col-6">
+
+
+            <br>
+            <h2 class="logo-text text-center">_promise<span class="monster-text">👾</span>monster_</h2>
+
+
+          </div>
+          <div class="col-3">
+
+          </div>
         </div><br>
       </div>
-      
-      <br>
-      <br>
+      <div>
+        <h6 class="about-description">A tool for crafting and executing conditional promises between two or more parties
+        </h6>
+      </div>
+
+      <div class="row">
+        <div class="col-6">
+          <p class="landing-description-paragraph">This is a guided interface to demonstrate in part the capabilities
+            and
+            tangible ambitions of the underlying immutable logic circuit as encoded in the <a
+              href="https://github.com/parseb/promise.monster/blob/master/foundry/src/Monster.sol">PromiseMonster</a>
+            smart contract.<br><b>Promises</b> are a core primitive in institution building and abstracted coordination.
+            This is an experiment and now one of the ways of using promises to constitute a permissionless promise
+            awarding and executing process.</p>
+        </div>
+        <div class="col-6">
+          <div>
+            <div>
+              <h4 class="functionality-list-title">Some of the Features:</h4><br>
+              <ul class="functionality-list-itmes">
+                <li>Liable entities carry reputation under the form of a address-bounded token</li>
+                <li>Promises are transferable ERC721s and refer to timeframe specific or not future transactions</li>
+                <li>Promises can be made with respect to any asset. Internally an asset is an ERC721 that wraps any
+                  other
+                  given ERC721 or ERC20 asset.</li>
+                <li><b>To recap:</b> Promises are NFTs, mostly delegations of future claims to any wrapped arbitrary
+                  asset. They are transferable and potentially valuable.</li>
+              </ul>
+            </div>
+            <div class="loginbtn-col"><button type="button" class="btn btn-outline-secondary btn-connect btn-lg"
+                id="connectBtn" onclick="onConnect()">
+                Connect a Wallet</button></div>
+          </div><br>
+        </div>
+
+        <br>
+        <br>
+      </div>
+
+
     </div>
-   
+    <div class="container d-none" id="activePage">
+      <div class="container">
+        <div class="row"><br><br>
+          <div class="col-1"><br><span class="current-address title2">promise<span class="dot0dot">.</span></span><br>
+            <hr /><span class="monster-address title2 monster"> <span
+                class="dot0dot">.</span>monster</span>
+          </div>
+          <div class="col-9"><br><span class="monster-address" id="monsterAddress"></span><br>
+            <hr /><span class="current-address" id="currentAddress"></span>
+          </div>
+          <div class="col-2"><button type="button"
+              class="btn btn-outline-secondary btn-disconnect btn-lg">Disconnect</button></div><br>
+          <hr />
+        </div>
+        <hr>
+        <div class="row row-soul">
+          <div class="card card-lifetime">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-2 age-title"><span class="text float-start lifetime-text"><b>Lifetime:</b></span></div>
+                <div class="col-10 record-pills"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr>
+        <hr>
+        <div class="row row-visualsoul">
+          <div class="row row-pannels">
+            <div>
+              <div> </div>
+              <div> </div>
+            </div>
+            <hr>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-<br>
+
+  <br>
 
 
 
   <footer class="footer mt-auto py-2 fixed-bottom">
     <div class="container">
 
-      <div class="row"> 
+      <div class="row">
         <div class="col-3">
           <div>
             Made with <span style="color: #e25555;">&hearts;</span> by <a class="text-decoration-none"
@@ -95,7 +139,8 @@
         </div>
         <div class="col-6">
           <div>
-            <p class="text text-muted float-end">inspired by <a href="https://github.com/delegatable/delegatable-eth">delegatable-eth</a>
+            <p class="text text-muted float-end">inspired by <a
+                href="https://github.com/delegatable/delegatable-eth">delegatable-eth</a>
               framework by Dan Finlay</p>
           </div>
         </div>
@@ -119,6 +164,9 @@
   <script src="https://cdn.ethers.io/lib/ethers-5.6.umd.min.js" type="application/javascript"></script>
 
   <script type="text/javascript" src="js/context.js"></script>
+  <script type="text/javascript" src="js/landingPage.js"></script>
+  <script type="text/javascript" src="js/activePage.js"></script>
+
   <script type="text/javascript" src="js/main.js"></script>
 
 </body>

@@ -3,7 +3,7 @@
   }
   
   body {
-    background-color: #D6CF89;
+    background-color: #C4C9B2;
   }
   
   .logo-text {
@@ -33,8 +33,8 @@
     color: #33562A;
   }
   
-  .color-cyan {
-    color: #75E3CF
+  .color-yellow {
+    color: #FAE28B;
   }
   
   hr.landing {
@@ -114,10 +114,12 @@
   
   .btn-disconnect {
     vertical-align: center !important;
-    margin-top: 10%;
+    margin-top: 16%;
     width: 100% !important;
     padding: 20px 20px 20px 20px!important;
     font-size: medium;
+    border-radius: 20px;
+
   }
   button.btn-disconnect:hover {
     color: whitesmoke !important;
@@ -153,6 +155,15 @@
     right: -50px !important;
   }
   
+.lifetime-text {
+  color: whitesmoke
+}
+
+.card-lifetime {
+  background-color:#DA0DDD;
+  border-radius: 20px;
+}
+
   .pill-soul {
     
   }

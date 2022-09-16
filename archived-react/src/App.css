@@ -3,7 +3,7 @@
 }
 
 body {
-  background-color: #D6CF89;
+  background-color: #E4536A;
 }
 
 .logo-text {
@@ -144,6 +144,14 @@ span.dot0dot {
   font-size: 120%;
   text-align: left;
   right: -50px !important;
+}
+
+.lifetime-text{
+  
+}
+
+.card-lifetime {
+  background-color: #33562A !important;
 }
 
 .pill-soul {
