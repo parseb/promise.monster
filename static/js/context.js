@@ -2,10 +2,10 @@
 
  const getPMAddress =  {
     1: "",
-    5: "0xd3AB598CA12D50B36a786286c04aEd4E49434E48",
+    5: {contract:"0xd3AB598CA12D50B36a786286c04aEd4E49434E48", explorer:"https://goerli.etherscan.io/"},
     10:"",
     420:"sdfsdfs",
-    80001: "0x5F5A0FD112e9307209751094912BD7C689CEdeEe"
+    80001: { contract: "0x5F5A0FD112e9307209751094912BD7C689CEdeEe", explorer:"https://mumbai.polygonscan.com/t"}
   }
 
 

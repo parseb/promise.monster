@@ -10,6 +10,10 @@ let provider
 let selectedAccount
 
 const stateColor = { 1: "light", 2: "success", 3: "danger", 4: "secondary" }
+const state = {
+    liabilities: [],
+    assets: []
+}
 
 async function init() {
     const landingContainer = document.getElementById("landingContainer")
@@ -21,6 +25,8 @@ async function init() {
 
     const monsterAddress = document.getElementById("monsterAddress");
     const currentAddress = document.getElementById("currentAddress");
+    const pillContainer = document.getElementById("pillContainer");
+    // const disconnectbtn = document.getElementById("disconnectbtn");
 
     console.log("WalletConnectProvider is", WalletConnectProvider)
     console.log("window.ethereum is", window.ethereum)
@@ -50,7 +56,6 @@ async function init() {
         disableInjectedProvider: false, // optional. For MetaMask / Brave / Opera.
     })
 
-
     console.log("Web3Modal instance is", web3Modal)
 }
 
@@ -59,19 +64,48 @@ async function init() {
  * Kick in the UI action after Web3modal dialog has chosen a provider
  */
 async function fetchPromises() {
+    const PM = state.PM
+    console.log(PM)
+    const soulID = await PM.getSoulID(state.currentAddress)
 
-    // Get a Web3 instance for the wallet
-    const web3 = new Web3(provider)
-    console.log("Web3 instance is", web3)
+    state.soulID = Number(soulID)
+    let hasOrIsPromised = await PM.getPIDS(state.currentAddress)
+    let PIDs = hasOrIsPromised.map(i => Number(i))
 
+    console.log(PIDs)
+    let promises = await PM.getLiabilitiesAssetsFor(state.currentAddress)
+    state.PIDs = PIDs
+    state.assets=[]
+    state.liabilities=[]
+    promises['Pa'].forEach((pa) =>
+    {
+        if (pa.claimOwner == state.currentAddress) {
+            state.assets.push(pa);
+        }
+    });
 
-}
+    promises['Pl'].forEach((pl) => {
+        if(pl.liableID == state.soulID) state.liabilities.push(pl)
+    })
+    let chainID = sessionStorage.getItem("chainID")
+    pillContainer.innerHTML += `<a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${PIDs[0]}" class="badge badge-soul">${PIDs[0]}</a>`
+    state.liabilities.slice(1).forEach((element, index) => {
+        let pp = `<a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${PIDs.slice(1)[index]}" class="badge badge-${stateColor[Number(element.state)]}">${PIDs.slice(1)[index]}</a>`
+        pillContainer.innerHTML +=pp
+    });
+
+    }
 
 
 async function setPMcontract() {
-    const PM = new state.web3.eth.Contract(PMabi, sessionStorage.getItem(PMaddress))
-
-    return PM
+    const provider =  new ethers.providers.Web3Provider(window.ethereum)
+    const signer = provider.getSigner()
+    const PMaddress = sessionStorage.getItem('PMaddress')
+    state.PMaddress = PMaddress
+    const PMread = new ethers.Contract(PMaddress, PMabi, signer)
+    state.PM= PMread;
+    state.currentAddress = sessionStorage.getItem('currentAccount')
+    
 }
 
 
@@ -105,20 +139,21 @@ async function onConnect() {
         console.log("Could not get a wallet connection", e)
         return
     }
+    if (provider) sessionStorage.setItem('provider', provider);
 
 
     const chainId = Number(provider.chainId)
     const ethereum = window.ethereum
     const web3 = new Web3(ethereum)
     const accounts = await web3.eth.getAccounts()
-    console.log(accounts)
+    state.chainId = chainId
 
 
     if (accounts[0]) {
         sessionStorage.setItem('chainID', chainId)
-        sessionStorage.setItem('PMaddress', getPMAddress[chainId])
+        sessionStorage.setItem('PMaddress', getPMAddress[chainId].contract)
         sessionStorage.setItem('currentAccount', accounts[0])
-        sessionStorage.setItem('PMAddress', getPMAddress[chainId])
+        sessionStorage.setItem('PMAddress', getPMAddress[chainId].contract)
 
         landingPage.classList.add('d-none')
         activePage.classList.remove('d-none')
@@ -150,12 +185,13 @@ async function onConnect() {
  * Disconnect wallet button pressed.
  */
 async function onDisconnect() {
-
+    console.log(Web3Provider)
+    const provider = sessionStorage.getItem('provider')
     console.log("Killing the wallet connection", provider)
 
     // TODO: Which providers have close method?
     if (provider.close) {
-        let provider = await web3Modal.connect()
+        let p = await web3Modal.connect()
         await provider.close()
 
         // If the cached provider is not cleared,
@@ -180,10 +216,14 @@ window.addEventListener('load', async () => {
         landingPage.classList.remove('d-none')
 
     } else {
+        
         activePage.classList.remove("d-none")
         landingPage.classList.add("d-none")
-        monsterAddress.innerText = "| 👾:" + sessionStorage.getItem('PMaddress')
-        currentAddress.innerText = "|🧍:" + sessionStorage.getItem('currentAccount')
+        monsterAddress.innerText = "|   👾: " + sessionStorage.getItem('PMaddress')
+        currentAddress.innerText = "|   🧍: " + sessionStorage.getItem('currentAccount')
+        setPMcontract();
+        fetchPromises();
+
     }
     init()
     // connectBtn.addEventListener("click", onConnect)

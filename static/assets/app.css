@@ -36,7 +36,11 @@
   .color-yellow {
     color: #FAE28B;
   }
-  
+  hr{
+    color: whitesmoke;
+  }
+
+
   hr.landing {
     size: 10px;
     height: 10px;
@@ -46,6 +50,8 @@
   
   }
   
+
+
   .about-description {
     color: #DA0DDD;
     font-family:'Courier New', Courier, monospace;
@@ -119,6 +125,7 @@
     padding: 20px 20px 20px 20px!important;
     font-size: medium;
     border-radius: 20px;
+    border-width: 2px;
 
   }
   button.btn-disconnect:hover {
@@ -164,9 +171,48 @@
   border-radius: 20px;
 }
 
-  .pill-soul {
+.black2 {
+  border-width: 2px;
+  border-color: #251F27;
+}
+
+.record-pills {
+  align-items: flex-start;
+}
+ 
+.pill-soul {
     
-  }
-  
+}
+
+.badge-soul {
+    background-color: #C4C9B2 !important;
+    border-radius: 2px !important;
+    color: #DA0DDD
+}
+ 
+.badge {
+  text-decoration:  none;
+  margin: 2px;
+}
+
+.badge-light {
+  background-color: bisque;
+  color: #DA0DDD
+}
+
+.badge-success {
+  background-color: #33562A;
+}
+
+.badge-danger {
+  background-color: red;
+}
+
+.badge-secondary {
+  background-color: grey;
+}
+
+
+
   /* #33562A
   #8CBC96 */
