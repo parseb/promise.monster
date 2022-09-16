@@ -193,6 +193,7 @@
 .badge {
   text-decoration:  none;
   margin: 2px;
+  font-size:medium;
 }
 
 .badge-light {
@@ -211,7 +212,10 @@
 .badge-secondary {
   background-color: grey;
 }
-
+.soul {
+  text-decoration: none;
+  color:whitesmoke;
+}
 
 
   /* #33562A

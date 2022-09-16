@@ -26,8 +26,8 @@ async function init() {
     const monsterAddress = document.getElementById("monsterAddress");
     const currentAddress = document.getElementById("currentAddress");
     const pillContainer = document.getElementById("pillContainer");
-    // const disconnectbtn = document.getElementById("disconnectbtn");
-
+    const disconnectbtn = document.getElementById("disconnectbtn");
+    const soulSpan = document.getElementById("soulSpan") 
     console.log("WalletConnectProvider is", WalletConnectProvider)
     console.log("window.ethereum is", window.ethereum)
 
@@ -88,7 +88,7 @@ async function fetchPromises() {
         if(pl.liableID == state.soulID) state.liabilities.push(pl)
     })
     let chainID = sessionStorage.getItem("chainID")
-    pillContainer.innerHTML += `<a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${PIDs[0]}" class="badge badge-soul">${PIDs[0]}</a>`
+    soulSpan.innerHTML += `<a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${PIDs[0]}" class="pill soul">${PIDs[0]}</a>`
     state.liabilities.slice(1).forEach((element, index) => {
         let pp = `<a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${PIDs.slice(1)[index]}" class="badge badge-${stateColor[Number(element.state)]}">${PIDs.slice(1)[index]}</a>`
         pillContainer.innerHTML +=pp
