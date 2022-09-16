@@ -16,11 +16,14 @@ import TopBar from "./TopBar";
                 assets: sessionStorage.assets,
                 liabilities: sessionStorage.liabilities || [],
                 currentSoul: sessionStorage.soulID,
-                promiseIDS: []
+                promiseIDS: [],
+                badgeData:[],
+                colors :{1:"light", 2:"success", 3:"danger", 4:"secondary" }
+
             }
 
             this.promisesLists = this.promisesLists.bind(this);
-            this.lifetimePills = this.lifetimePills.bind(this);
+            //this.lifetimePills = this.lifetimePills.bind(this);
         }
         
         async componentDidMount() {
@@ -58,7 +61,8 @@ import TopBar from "./TopBar";
                     //     bytes callData;
                     // }
                     const soul = await PMread.getSoulID(this.state.currentAccount);
-
+                    const hasOrIsPromised = await PMread.getPIDS(this.state.currentAccount);
+                    const pIDS = await hasOrIsPromised.slice(1);
                     const soulID = Number(soul)
 
                     this.setState({
@@ -66,13 +70,27 @@ import TopBar from "./TopBar";
                         // liabile: response['Pl'],
                         // owed: response['Pa'],
                         currentSoul: soulID,
-                        promises: promises
+                        promises: [...promises],
+                        hasOrIsPromised: [...hasOrIsPromised],
+                        pIDS: [...pIDS],
                     })
 
+                    const badgeData = []
+                    for (let i=0; i < this.state.promises.length; i++) {
+                        let p = this.state.promises[i];
+                        if (p.state == 0) continue;
+                        if (Number(p.liableID) == this.state.currentSoul) {
+                            badgeData.push([Number(p.state),Number(this.state.pIDS[i])]);
+                            }
+                        }
+                    
+                        this.setState({
+                            badgeData: [...badgeData]
+                        })
 
-                    sessionStorage.setItem('soulID', soulID);
-               console.log(this.state.promises) 
-               console.log(Number(this.state.currentSoul))
+
+               sessionStorage.setItem('soulID', soulID);
+
 
             } catch (err){
                 console.log(err);
@@ -88,29 +106,16 @@ import TopBar from "./TopBar";
         //     Expired -4 
         // }
 
-        lifetimePills() {
-            const pills = []
-            const colors = {1:"light", 2:"success", 3:"danger", 4:"secondary" }
-            for (let i=0; i < this.state.promises.length; i++) {
-                let p = this.state.promises[i];
-                console.log(p.liabileID, this.state.currentSoul, p.state);
-                if (p.state == 0) continue;
-                if (Number(p.liableID) == this.state.currentSoul) {
-                            pills.push(  <Badge className='pill-soul' pill bg={colors[p.state]} key={i}>ID</Badge> )
-                    }
-                }
-            return pills;
-        
-    }
+    
         promisesLists() {
             const liabilities = []
             const assets = []
             
             for (let i=0; i < this.state.promises.length; i++) {
-               
                 let p = this.state.promises[i];
-                console.log(p.claimOwner, this.state.currentAccount)
-                if(Number(p.liableID) == sessionStorage.soulID ) {
+                let lid = Number(p.liableID);
+                console.log(lid, Number(sessionStorage.soulID), 'liabilities if equal')
+                if(lid == sessionStorage.soulID ) {
                     liabilities.push(<p className='liability' key={i}> {String(p.claimOwner)} </p>)
                     
                 } else if (String(p.claimOwner) == String(localStorage.currentAccount)) {
@@ -122,8 +127,10 @@ import TopBar from "./TopBar";
         return  <div><div> {liabilities} </div><div> { assets }</div></div>
         }
 
-        render() {
 
+
+
+        render() {
 
 
             // console.log(liabilities);
@@ -142,7 +149,12 @@ import TopBar from "./TopBar";
                     Life: 
                 </div>
                 <div className='col-10 record-pills'>
-                { this.lifetimePills()}
+                { this.state.badgeData.map((val,index) => {
+                   return <Badge className='pill-soul' pill bg={this.state.colors[2]} key={index}>{val[0]}</Badge>
+                }) }
+                
+
+                
                 </div>
             </div>
         </Card>

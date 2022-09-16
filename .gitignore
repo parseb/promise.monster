@@ -1,7 +1,7 @@
 foundry/out
 foundry/cache
 foundry/.env
-foundry/broadcast/*
+foundry/broadcast/
 react/.env
 react/.secret
 react/secrets

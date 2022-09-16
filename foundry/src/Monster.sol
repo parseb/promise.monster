@@ -332,6 +332,10 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         A = assetToken[id_];
     }
 
+    function getPIDS(address ofWho_) external view returns (uint[] memory) {
+        return hasOrIsPromised[ofWho_];
+    }
+
     function getPromiseHistory(address who_) public view returns (Promise[] memory) {
         uint256 x = hasOrIsPromised[who_].length;
 

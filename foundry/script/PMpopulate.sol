@@ -7,8 +7,9 @@
 // import "../test/mocks/mockERC721.sol";
 
 // contract PMpopulate is Script {
-
-//     PromiseMonster PM = PromiseMonster(0x532b93bf868c0D50296CA4c09a0578335aA96Fa5);
+//     /// mumbai 0x5F5A0FD112e9307209751094912BD7C689CEdeEe
+//     /// goerli 0xd3AB598CA12D50B36a786286c04aEd4E49434E48
+//     PromiseMonster PM = PromiseMonster(0x5F5A0FD112e9307209751094912BD7C689CEdeEe);
 //     MockERC20 E20;
 //     Mock721 E721;
 
@@ -79,24 +80,24 @@
 //         );
 
 
-//         PM.mintPromise(
-//             setupDelegation(0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-//             0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd,
-//             abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E20),1,20*10**18, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-//             [block.timestamp, block.timestamp + 3245000]
-//         );
-//         PM.mintPromise(
-//             setupDelegation(0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-//             0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd,
-//             abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E721),2,1111, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-//             [block.timestamp, block.timestamp + 3245000]
-//         );
-//         PM.mintPromise(
-//             setupDelegation(0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-//             0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd,
-//             abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E721),2,2222, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-//             [block.timestamp, block.timestamp + 3245000]
-//         );
+//         // PM.mintPromise(
+//         //     setupDelegation(0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
+//         //     0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd,
+//         //     abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E20),1,20*10**18, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
+//         //     [block.timestamp, block.timestamp + 3245000]
+//         // );
+//         // PM.mintPromise(
+//         //     setupDelegation(0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
+//         //     0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd,
+//         //     abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E721),2,1111, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
+//         //     [block.timestamp, block.timestamp + 3245000]
+//         // );
+//         // PM.mintPromise(
+//         //     setupDelegation(0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
+//         //     0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd,
+//         //     abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E721),2,2222, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
+//         //     [block.timestamp, block.timestamp + 3245000]
+//         // );
 
 //         vm.stopBroadcast();
 //     }
