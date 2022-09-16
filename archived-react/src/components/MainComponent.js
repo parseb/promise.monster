@@ -153,8 +153,6 @@ import TopBar from "./TopBar";
                    return <Badge className='pill-soul' pill bg={this.state.colors[2]} key={index}>{val[0]}</Badge>
                 }) }
                 
-
-                
                 </div>
             </div>
         </Card>

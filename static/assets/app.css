@@ -1,0 +1,161 @@
+.App {
+    text-align: center;
+  }
+  
+  body {
+    background-color: #D6CF89;
+  }
+  
+  .logo-text {
+    color: #DA0DDD;
+    font-family:'Courier New', Courier, monospace;
+    font-weight: 600;
+    font-size:xx-large
+  
+  }
+  
+  .monster-text {
+    font-size: 100px;
+    margin-bottom:40px;
+    position: relative;
+    top: -23px;
+  }
+  
+  .main-container {
+    margin-top: 10px;
+  }
+  
+  .about-description {
+    color:#251F27;
+  }
+  
+  .color-green {
+    color: #33562A;
+  }
+  
+  .color-cyan {
+    color: #75E3CF
+  }
+  
+  hr.landing {
+    size: 10px;
+    height: 10px;
+    color: #75E3CF;
+    margin-bottom: -10px;
+    margin-top: 6px;
+  
+  }
+  
+  .about-description {
+    color: #DA0DDD;
+    font-family:'Courier New', Courier, monospace;
+    font-weight: 600;
+    font-size:x-large
+  }
+  
+  p.landing-description-paragraph {
+    margin-top: 90px;
+    color: #33562A;
+    font-family:'Courier New', Courier, monospace;
+    font-size: 22px;
+    text-align: left;
+  }
+  
+  .loginbtn-col {
+    margin-top: 30px;
+  }
+  
+  button.btn-connect:hover {
+    color: whitesmoke !important;
+    background-color: #DA0DDD !important;
+  }
+  
+  .functionality-list-itmes  {
+    color: #33562A;
+    font-size: larger;
+    font-family:'Courier New', Courier, monospace;
+  
+  
+  }
+  
+  .functionality-list-title {
+    color: #33562A;
+    font-family:'Courier New', Courier, monospace;
+    margin-top: 30px;
+  }
+  
+  @counter-style repeating-emoji {
+    system: cyclic;
+    symbols: "\1F47e";
+    suffix: " ";
+  }
+  
+  /* li:marker {
+    list-style-image: url("https://emojipedia-us.s3.amazonaws.com/source/microsoft-teams/337/alien-monster_1f47e.png")
+  } */
+  
+  ul li::marker {
+    content: "-👾-";
+  }
+  
+  ul li.alien {
+    text-align: left !important;
+  }
+  
+  span.current-address {
+    color: #33562A;
+    font-family:'Courier New', Courier, monospace;
+  }
+  
+  span.monster-address{
+    color: #DA0DDD;
+    font-family:'Courier New', Courier, monospace;
+  }
+  
+  .btn-disconnect {
+    vertical-align: center !important;
+    margin-top: 10%;
+    width: 100% !important;
+    padding: 20px 20px 20px 20px!important;
+    font-size: medium;
+  }
+  button.btn-disconnect:hover {
+    color: whitesmoke !important;
+    background-color: #DA0DDD !important;
+  }
+  
+  .title2 {
+    font-weight: 800;
+  }
+  .title2.monster {
+    font-weight: 800;
+    text-align: right !important;
+  }
+  
+  hr.landing-2 {
+    size: 10px;
+    height: 10px;
+    color: slategray;
+    margin-bottom: -10px;
+    margin-top: 6px;
+  }
+  
+  span.dot0dot {
+    font-weight: 1000;
+    display: inline;
+    font-size: large;
+  }
+  
+  .age-title {
+    font-family:cursive;
+    font-size: 120%;
+    text-align: left;
+    right: -50px !important;
+  }
+  
+  .pill-soul {
+    
+  }
+  
+  /* #33562A
+  #8CBC96 */
