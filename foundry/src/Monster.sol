@@ -136,16 +136,15 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
                         External
     //////////////////////////////////////////////////////////////*/
 
-    /// @notice wraps assets in an ERC721 token
+    /// @notice wraps any ERC20 or ERC721 assets in a Promise Monster ERC721 token
     /// @param contract_ address of the token contract
     /// @param howmuch_ quantity of ERC20 or ERC721 token ID
     function makeAsset(address contract_, uint8 assetType, uint256 howmuch_, address to_) external returns (bool s) {
-        require(assetToken[globalID].tokenAddress == address(0), "Asset exists");
-        // address sender = msg.sender == address(this) ? _msgSender();
+        globalID = incrementIDAsset(); ///@dev noticed potential promise/2 and asset/10 id override. untested
+
         if (to_ == address(0)) {
             to_ = _msgSender();
         }
-        globalID = incrementIDAsset();
         assetToken[globalID].tokenAddress = contract_;
         assetToken[globalID].assetType = assetType;
         assetToken[globalID].howMuch = howmuch_;
@@ -326,6 +325,33 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
 
     function getPromiseByID(uint256 id_) public view returns (Promise memory P) {
         P = getPromise[id_];
+    }
+
+    function getAssetsOf(address who_) public view returns (Asset[] memory X) {
+        uint[] memory pids = hasOrIsPromised[who_];
+        Asset[] memory A = new Asset[](pids.length);
+        /// @dev
+        uint i;
+        uint c;
+        for (;i < pids.length;) {
+            if(pids[i] % 10 == 0 && ownerOf(pids[i])  == who_) {
+                A[i] =  assetToken[pids[i]];
+                unchecked { ++ c; }
+                pids[i] = 0;
+            }
+            unchecked { ++ i;}
+        }
+
+        X = new Asset[](c);
+        for (;i<pids.length;) {
+            if (pids[i] !=0)  { 
+                X[c] = (assetToken[i]); 
+                unchecked { -- c;}
+            }
+            unchecked { -- i; }
+        }
+        
+
     }
 
     function getAssetByID(uint256 id_) external view returns (Asset memory A) {

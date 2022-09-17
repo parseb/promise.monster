@@ -196,7 +196,7 @@
 }
 
 .badge-light {
-  background-color: bisque;
+  background-color: whitesmoke;
   color: #DA0DDD
 }
 
@@ -220,19 +220,31 @@
   background-color: #E4536A;
 }
 
-.accordion-button:focus {
+[aria-expanded] {
   background-color:whitesmoke;
-  color:#33562A !important;
+  color:#E4536A !important;
+  font-weight: 700;
+}
+
+.collapsing {
+  background-color: #E4536A !important;
 }
 
 button.accordion-button.collapsed {
   background-color: #DA0DDD;
-  color: whitesmoke;
+  color: whitesmoke !important;
   font-weight: 900;
 }
 
 .accordion-button {
-  border: 1px #251F27 !important!;
+  border: 1px #251F27 !important;
+}
+.accordion-body{
+  color: whitesmoke;
+}
+
+hr {
+  color: #86b7fe;
 }
 
 /* 33562A
