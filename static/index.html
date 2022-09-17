@@ -117,7 +117,49 @@
                 </button>
               </h2>
               <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-                <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the first item's accordion body.</div>
+                <div class="accordion-body" id="execute-promises-space">
+                  <div class="promise-a">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">#id</th>
+                          <th scope="col">By</th>
+                          <th scope="col">Exec. Interval</th>
+                          <th scope="col">Contract Call</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="row">1</th>
+                          <td>43</td>
+                          <td><span id="start">
+
+                          </span>--
+                          <span id="end">
+
+                          </span> </td>
+                          <td>0x00000000000</td>
+                          <td id="exe-button">
+                            <button class="btn btn-info btn-exec float-sm-end">
+                              execute
+                            </button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">2</th>
+                          <td>Jacob</td>
+                          <td>Thornton</td>
+                          <td>@fat</td>
+                        </tr>
+                        <tr>
+                          <th scope="row">3</th>
+                          <td colspan="2">Larry the Bird</td>
+                          <td>@twitter</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="accordion-item">
@@ -127,8 +169,15 @@
                 </button>
               </h2>
               <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
-                <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the second item's accordion body. Let's imagine this being filled with some actual content.</div>
+                <div class="accordion-body" id="create-new-promise-space">
+                   
+                  
+
+
+
+
               </div>
+            </div>
             </div>
             <div class="accordion-item">
               <h2 class="accordion-header" id="flush-headingThree">
@@ -137,8 +186,13 @@
                 </button>
               </h2>
               <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
-                <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the third item's accordion body. Nothing more exciting happening here in terms of content, but just filling up the space to make it look, at least at first glance, a bit more representative of how this would look in a real-world application.</div>
-              </div>
+                <div class="accordion-body" id="asset-create-show-space">
+                  
+
+
+
+
+                </div>
             </div>
           </div>
         </div>
@@ -163,7 +217,7 @@
         </div>
         <div class="col-2">
           <button type="button"
-            class="btn btn-outline-secondary btn-disconnect " id="disconnectbtn" onclick="onDisconnect()">
+            class="btn btn-outline-secondary btn-disconnect d-none" id="disconnectBtn" onclick="onDisconnect()">
             Disconnect</button>
         </div>
         <div class="col-6">

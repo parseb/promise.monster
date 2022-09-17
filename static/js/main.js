@@ -26,7 +26,6 @@ async function init() {
     const monsterAddress = document.getElementById("monsterAddress");
     const currentAddress = document.getElementById("currentAddress");
     const pillContainer = document.getElementById("pillContainer");
-    const disconnectbtn = document.getElementById("disconnectbtn");
     const soulSpan = document.getElementById("soulSpan") 
     console.log("WalletConnectProvider is", WalletConnectProvider)
     console.log("window.ethereum is", window.ethereum)
@@ -130,8 +129,6 @@ async function refreshAccountData() {
  */
 async function onConnect() {
 
-
-
     console.log("Opening a dialog", web3Modal)
     try {
         provider = await web3Modal.connect("fffff")
@@ -155,8 +152,7 @@ async function onConnect() {
         sessionStorage.setItem('currentAccount', accounts[0])
         sessionStorage.setItem('PMAddress', getPMAddress[chainId].contract)
 
-        landingPage.classList.add('d-none')
-        activePage.classList.remove('d-none')
+        connectStuff();
  
     } else {
         console.log("connection failed")
@@ -200,8 +196,7 @@ async function onDisconnect() {
         // Depending on your use case you may want or want not his behavir.
         await web3Modal.clearCachedProvider()
         provider = null
-        activePage.classList.add("d-none")
-        sessionStorage.clear("currentAccount")
+        disconnectStuff();
 
     }
 
@@ -209,25 +204,35 @@ async function onDisconnect() {
     sessionStorage.clear('currentAccount')
 }
 
+function connectStuff() {
+    activePage.classList.remove("d-none")
+    landingPage.classList.add("d-none")
+    monsterAddress.innerText = "|   👾: " + sessionStorage.getItem('PMaddress')
+    currentAddress.innerText = "|   🧍: " + sessionStorage.getItem('currentAccount')
+    disconnectBtn.classList.remove('d-none')
+    setPMcontract();
+    fetchPromises();
+}
+
+function disconnectStuff() {
+    sessionStorage.clear()
+    activePage.classList.add("d-none")
+    landingPage.classList.remove("d-none")
+    disconnectBtn.classList.add('d-none')
+}
+
 window.addEventListener('load', async () => {
 
 
     if (!sessionStorage.getItem('currentAccount')) {
-        landingPage.classList.remove('d-none')
-
+        disconnectStuff()
     } else {
-        
-        activePage.classList.remove("d-none")
-        landingPage.classList.add("d-none")
-        monsterAddress.innerText = "|   👾: " + sessionStorage.getItem('PMaddress')
-        currentAddress.innerText = "|   🧍: " + sessionStorage.getItem('currentAccount')
-        setPMcontract();
-        fetchPromises();
-
+        connectStuff()
     }
     init()
     // connectBtn.addEventListener("click", onConnect)
-    // disconnectBtn.addEventListener("click", onDisconnect)
+    disconnectBtn.addEventListener("click", onDisconnect)
+
 })
 
 

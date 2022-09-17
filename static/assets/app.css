@@ -168,6 +168,8 @@
 .card-lifetime {
   background-color:#DA0DDD;
   border-radius: 0px;
+  border: 1px #251F27 solid !important;
+
 }
 
 .black1 {
@@ -237,7 +239,7 @@ button.accordion-button.collapsed {
 }
 
 .accordion-button {
-  border: 1px #251F27 !important;
+  border: 1px #251F27 solid !important;
 }
 .accordion-body{
   color: whitesmoke;
@@ -245,6 +247,13 @@ button.accordion-button.collapsed {
 
 hr {
   color: #86b7fe;
+}
+.accordion-item {
+  margin-bottom: 1px !important;
+}
+
+.btn-exec:hover {
+  color: whitesmoke !important;
 }
 
 /* 33562A

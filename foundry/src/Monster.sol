@@ -240,6 +240,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         if (hasOrIsPromised[to_].length == 0) {
             hasOrIsPromised[to_].push(0);
         }
+        hasOrIsPromised[to_].push(pID);
         hasOrIsPromised[liable].push(pID);
 
         getPromise[pID] = newP;
