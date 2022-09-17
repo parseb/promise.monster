@@ -119,12 +119,11 @@
   }
   
   .btn-disconnect {
-    vertical-align: center !important;
-    margin-top: 16%;
+    display: block;
+    margin: 0 auto !important;
     width: 100% !important;
-    padding: 20px 20px 20px 20px!important;
     font-size: medium;
-    border-radius: 20px;
+    border-radius: 2px;
     border-width: 2px;
 
   }
@@ -168,11 +167,11 @@
 
 .card-lifetime {
   background-color:#DA0DDD;
-  border-radius: 20px;
+  border-radius: 0px;
 }
 
-.black2 {
-  border-width: 2px;
+.black1 {
+  border-width: 1px;
   border-color: #251F27;
 }
 
@@ -217,6 +216,30 @@
   color:whitesmoke;
 }
 
+.collapse.show {
+  background-color: #E4536A;
+}
+
+.accordion-button:focus {
+  background-color:whitesmoke;
+  color:#33562A !important;
+}
+
+button.accordion-button.collapsed {
+  background-color: #DA0DDD;
+  color: whitesmoke;
+  font-weight: 900;
+}
+
+.accordion-button {
+  border: 1px #251F27 !important!;
+}
+
+/* 33562A
+E4536A
+FAE28B
+C4C9B2
+DA0DDD */
 
   /* #33562A
   #8CBC96 */
