@@ -125,7 +125,7 @@
     font-size: medium;
     border-radius: 2px;
     border-width: 2px;
-
+    padding: 4px;
   }
   button.btn-disconnect:hover {
     color: whitesmoke !important;
@@ -256,6 +256,32 @@ hr {
   color: whitesmoke !important;
 }
 
+.space{
+  height: 80px;
+}
+
+.patable {
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
+.funcName {
+  font-weight: bold;
+}
+
+.texe {
+  table-layout: fixed;
+}
+
+
+td.funcArgs {
+ display: table-cell;
+ overflow: auto;
+}
+
+.footer {
+  background-color: #C4C9B2;
+}
 /* 33562A
 E4536A
 FAE28B

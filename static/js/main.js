@@ -26,8 +26,8 @@ async function init() {
     const monsterAddress = document.getElementById("monsterAddress");
     const currentAddress = document.getElementById("currentAddress");
     const pillContainer = document.getElementById("pillContainer");
-    const soulSpan = document.getElementById("soulSpan") 
-    console.log("WalletConnectProvider is", WalletConnectProvider)
+    const soulSpan = document.getElementById("soulSpan")
+    const exePromisePlace = document.getElementById("exePromisePlace")
     console.log("window.ethereum is", window.ethereum)
 
 
@@ -64,36 +64,79 @@ async function init() {
  */
 async function fetchPromises() {
     const PM = state.PM
-    console.log(PM)
     const soulID = await PM.getSoulID(state.currentAddress)
+    const PMinterface = new ethers.utils.Interface(PMabi)
+
 
     state.soulID = Number(soulID)
     let hasOrIsPromised = await PM.getPIDS(state.currentAddress)
     let PIDs = hasOrIsPromised.map(i => Number(i))
-
-    console.log(PIDs)
+    let chainID = sessionStorage.getItem("chainID")
     let promises = await PM.getLiabilitiesAssetsFor(state.currentAddress)
-    state.PIDs = PIDs
-    state.assets=[]
+    state.PIDs = PIDs.slice(1) //rm soul
+    
+    state.Passets=[]
     state.liabilities=[]
-    promises['Pa'].forEach((pa) =>
+    let countID = 0
+    promises['Pa'].forEach( async (pa) =>
     {
-        if (pa.claimOwner == state.currentAddress) {
-            state.assets.push(pa);
+        if (pa.claimOwner == state.currentAddress && pa.state == 1) {
+            state.Passets.push(pa)
+            const func = PMinterface.getFunction(pa.callData.slice(0,10))
+            const funcName = func.name
+            const funcArgs = PMinterface.decodeFunctionData(func.name, pa.callData)
+            const FXargs = Object.entries(funcArgs).map(([key, value]) => `${key}: ${value}`)
+            const FXA = FXargs.slice(FXargs.length/2).join("<br/>");
+    
+        
+            const paItem= `
+        <tr>
+        <td><a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${pa.liableID}">${Number(pa.liableID)}</a></td>
+        <td><span id="start">
+            ${Date(Number(pa.times[0])).toLocaleString('en-US')}
+        </span> <b> <hr> </b>
+        <span id="end">
+            ${Date(Number(pa.times[1])).toLocaleString('en-US')}
+        </span> </td>
+        <td class="funcName">${funcName}</td>
+        <div class="overflow-auto">
+        <td class="funcArgs">${FXA}</td>
+        </div>
+        <td id="exe-button">
+        <button class="btn btn-info float-sm-end" id="btnExecuteP" onclick="executePromise(${state.PIDs[countID-1]})">
+        execute
+        </button>
+        </td>
+        </tr>
+        `;
+        console.log(countID);
+        exePromisePlace.innerHTML += paItem
+        countID++ /// @dev -1 
+        } else {
+            countID++ 
         }
+    
+
     });
 
     promises['Pl'].forEach((pl) => {
-        if(pl.liableID == state.soulID) state.liabilities.push(pl)
+        if(pl.liableID == state.soulID && state.soulID != 0) state.liabilities.push(pl)
     })
-    let chainID = sessionStorage.getItem("chainID")
     soulSpan.innerHTML += `<a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${PIDs[0]}" class="pill soul">${PIDs[0]}</a>`
     state.liabilities.slice(1).forEach((element, index) => {
         let pp = `<a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${PIDs.slice(1)[index]}" class="badge badge-${stateColor[Number(element.state)]}">${PIDs.slice(1)[index]}</a>`
         pillContainer.innerHTML +=pp
     });
+}
 
-    }
+
+async function executePromise(promiseID) {
+    const PM = state.PM
+    const success = await PM.executePromise(promiseID);
+    if(Boolean(success)) alert(`${promiseID} executed. w\ Much success!`)
+
+}
+
 
 
 async function setPMcontract() {
@@ -101,8 +144,8 @@ async function setPMcontract() {
     const signer = provider.getSigner()
     const PMaddress = sessionStorage.getItem('PMaddress')
     state.PMaddress = PMaddress
-    const PMread = new ethers.Contract(PMaddress, PMabi, signer)
-    state.PM= PMread;
+    const PM = new ethers.Contract(PMaddress, PMabi, signer)
+    state.PM= PM;
     state.currentAddress = sessionStorage.getItem('currentAccount')
     
 }
@@ -129,7 +172,6 @@ async function refreshAccountData() {
  */
 async function onConnect() {
 
-    console.log("Opening a dialog", web3Modal)
     try {
         provider = await web3Modal.connect("fffff")
     } catch (e) {
@@ -181,10 +223,12 @@ async function onConnect() {
  * Disconnect wallet button pressed.
  */
 async function onDisconnect() {
+    sessionStorage.clear()
+    location.reload();
     console.log(Web3Provider)
     const provider = sessionStorage.getItem('provider')
     console.log("Killing the wallet connection", provider)
-
+    
     // TODO: Which providers have close method?
     if (provider.close) {
         let p = await web3Modal.connect()
@@ -204,14 +248,14 @@ async function onDisconnect() {
     sessionStorage.clear('currentAccount')
 }
 
-function connectStuff() {
+async function connectStuff() {
     activePage.classList.remove("d-none")
     landingPage.classList.add("d-none")
     monsterAddress.innerText = "|   👾: " + sessionStorage.getItem('PMaddress')
     currentAddress.innerText = "|   🧍: " + sessionStorage.getItem('currentAccount')
     disconnectBtn.classList.remove('d-none')
-    setPMcontract();
-    fetchPromises();
+    await setPMcontract();
+    await fetchPromises();
 }
 
 function disconnectStuff() {
@@ -234,5 +278,9 @@ window.addEventListener('load', async () => {
     disconnectBtn.addEventListener("click", onDisconnect)
 
 })
+
+window.addEventListener('ready', async () => {
+    btnExecuteP = document.getElementById("btnExecuteP")
+});
 
 
