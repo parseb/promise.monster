@@ -25,7 +25,7 @@
 //         return result;
 //     }
 //     function setupDelegation(address to_) public returns (SignedDelegation memory) {
-        
+
 //         Delegation memory d1;
 //         SignedDelegation memory signedD1;
 
@@ -52,7 +52,6 @@
 
 //     function run() external {
 
-
 //         vm.startBroadcast();
 //         E20 = new MockERC20();
 //         E721 = new Mock721();
@@ -78,7 +77,6 @@
 //             abi.encodeWithSignature("burnAsset(uint256,address)", 20, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
 //             [block.timestamp, block.timestamp + 3245000]
 //         );
-
 
 //         // PM.mintPromise(
 //         //     setupDelegation(0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),

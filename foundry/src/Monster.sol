@@ -140,7 +140,8 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     /// @param contract_ address of the token contract
     /// @param howmuch_ quantity of ERC20 or ERC721 token ID
     function makeAsset(address contract_, uint8 assetType, uint256 howmuch_, address to_) external returns (bool s) {
-        globalID = incrementIDAsset(); ///@dev noticed potential promise/2 and asset/10 id override. untested
+        globalID = incrementIDAsset();
+        ///@dev noticed potential promise/2 and asset/10 id override. untested
 
         if (to_ == address(0)) {
             to_ = _msgSender();
@@ -328,37 +329,43 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     }
 
     function getAssetsOf(address who_) public view returns (Asset[] memory X) {
-        uint[] memory pids = hasOrIsPromised[who_];
+        uint256[] memory pids = hasOrIsPromised[who_];
         Asset[] memory A = new Asset[](pids.length);
         /// @dev
-        uint i;
-        uint c;
-        for (;i < pids.length;) {
-            if(pids[i] % 10 == 0 && ownerOf(pids[i])  == who_) {
-                A[i] =  assetToken[pids[i]];
-                unchecked { ++ c; }
+        uint256 i;
+        uint256 c;
+        for (; i < pids.length;) {
+            if (pids[i] % 10 == 0 && ownerOf(pids[i]) == who_) {
+                A[i] = assetToken[pids[i]];
+                unchecked {
+                    ++c;
+                }
                 pids[i] = 0;
             }
-            unchecked { ++ i;}
+            unchecked {
+                ++i;
+            }
         }
 
         X = new Asset[](c);
-        for (;i<pids.length;) {
-            if (pids[i] !=0)  { 
-                X[c] = (assetToken[i]); 
-                unchecked { -- c;}
+        for (; i < pids.length;) {
+            if (pids[i] != 0) {
+                X[c] = (assetToken[i]);
+                unchecked {
+                    --c;
+                }
             }
-            unchecked { -- i; }
+            unchecked {
+                --i;
+            }
         }
-        
-
     }
 
     function getAssetByID(uint256 id_) external view returns (Asset memory A) {
         A = assetToken[id_];
     }
 
-    function getPIDS(address ofWho_) external view returns (uint[] memory) {
+    function getPIDS(address ofWho_) external view returns (uint256[] memory) {
         return hasOrIsPromised[ofWho_];
     }
 
