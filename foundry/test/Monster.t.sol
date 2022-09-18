@@ -124,6 +124,11 @@ contract MonsterTest is Test {
         PM.burnAsset(id, address(0));
     }
 
+    function testGetsAssets() public {
+        testCreate7210AssetTO();
+        assertTrue( PM.getAssetsOf(address(79)).length > 0, 'no assets retrieved');
+    }
+
     function testPromiseMintAssetTo() public {}
 
     // function testCheckIntuition(uint x) public {

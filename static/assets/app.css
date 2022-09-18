@@ -282,6 +282,18 @@ td.funcArgs {
 .footer {
   background-color: #C4C9B2;
 }
+
+a.liable-id {
+  text-decoration: none;
+  color:#251F27
+}
+
+a.liable-id:hover {
+  color: whitesmoke;
+}
+
+
+
 /* 33562A
 E4536A
 FAE28B

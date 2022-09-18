@@ -91,7 +91,7 @@ async function fetchPromises() {
         
             const paItem= `
         <tr>
-        <td><a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${pa.liableID}">${Number(pa.liableID)}</a></td>
+        <td><a class="liable-id" href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${pa.liableID}">${Number(pa.liableID)}</a></td>
         <td><span id="start">
             ${Date(Number(pa.times[0])).toLocaleString('en-US')}
         </span> <b> <hr> </b>
@@ -133,10 +133,56 @@ async function fetchPromises() {
 async function executePromise(promiseID) {
     const PM = state.PM
     const success = await PM.executePromise(promiseID);
-    if(Boolean(success)) alert(`${promiseID} executed. w\ Much success!`)
+    if(String(success)=="success") alert(`${promiseID} executed. w\ Much success!`)
 
 }
 
+async function getAllAssets() {
+    const PM = state.PM
+    const assets = await PM.getAssetsOf(state.currentAddress)
+    state.assets = assets
+
+    const provider =  new ethers.providers.Web3Provider(window.ethereum)
+    const signer = provider.getSigner()
+
+    assets.forEach( async (a) => {
+
+        let type = Number(Number(a.type)) == 1 ? "ERC20" : "ERC271"
+        if (type == "ERC20") {
+            const Tcontract = new ethers.Contract(a.tokenAddress, ERC20abi, signer)
+        } else {     const Tcontract = new ethers.Contract(a.tokenAddress, ERC721abi, signer)
+        }
+        let name = await Tcontract.name()
+        let howMuch = Number(a.howMuch)
+        aTableBody.innerHTML += `
+            <td class="liable-id">
+                ${type}
+            </td>
+            <td class="amount-a">
+                ${howMuch}
+            </td>
+            <td>
+                ${name}
+            </td>
+            <td>
+                <button class="btn btn-warning" onclick="burnAsset">
+                    Burn Asset
+                </button>
+            </td>
+
+            `
+
+
+    })
+}
+
+function burnAsset(){
+
+}
+
+async function createAsset() {
+
+}
 
 
 async function setPMcontract() {
@@ -155,9 +201,9 @@ async function setPMcontract() {
 
 async function submitTransaction() {
 
-    const ethersProvider = new ethers.providers.Web3Provider(window.ethereum)
-    let signer = ethersProvider.getSigner()
-    let PMpost = new ethers.Contract(sessionStorage.getItem(PMaddress), PMabi, ethersProvider)
+    // const ethersProvider = new ethers.providers.Web3Provider(window.ethereum)
+    // let signer = ethersProvider.getSigner()
+    // let PMpost = new ethers.Contract(sessionStorage.getItem(PMaddress), PMabi, ethersProvider)
 
 }
 
@@ -256,6 +302,7 @@ async function connectStuff() {
     disconnectBtn.classList.remove('d-none')
     await setPMcontract();
     await fetchPromises();
+    await getAllAssets();
 }
 
 function disconnectStuff() {
