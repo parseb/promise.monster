@@ -68,7 +68,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     /// @notice registers asset bearing token
     mapping(uint256 => Asset) assetToken;
 
-    mapping(address => Asset[]) assetsOf;
+    mapping(address => uint[]) assetIDS;
 
     /*//////////////////////////////////////////////////////////////
                         Constructor
@@ -151,7 +151,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         assetToken[globalID].tokenAddress = contract_;
         assetToken[globalID].assetType = assetType;
         assetToken[globalID].howMuch = howmuch_;
-        assetsOf[to_].push(assetToken[globalID]);
+        assetIDS[to_].push(globalID);
 
         uint256 balance;
 
@@ -334,8 +334,8 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
 
 
     //// 
-    function getAssetsOf(address who_) external view returns (Asset[] memory) {
-        return assetsOf[who_];
+    function assetsOf(address who_) external view returns (uint256[] memory) {
+        return assetIDS[who_];
         // uint256[] memory pids = hasOrIsPromised[who_];
         // Asset[] memory A = new Asset[](pids.length);
         // /// @dev

@@ -28,6 +28,9 @@ async function init() {
     const pillContainer = document.getElementById("pillContainer");
     const soulSpan = document.getElementById("soulSpan")
     const exePromisePlace = document.getElementById("exePromisePlace")
+    const aTableBody = document.getElementById("aTableBody")
+
+
     console.log("window.ethereum is", window.ethereum)
 
 
@@ -139,45 +142,46 @@ async function executePromise(promiseID) {
 
 async function getAllAssets() {
     const PM = state.PM
-    const assets = await PM.getAssetsOf(state.currentAddress)
-    state.assets = assets
-
+    const aID = await PM.assetsOf(state.currentAddress)
+    state.aIDs = Number(aID)
     const provider =  new ethers.providers.Web3Provider(window.ethereum)
     const signer = provider.getSigner()
+    //// @dev error on interating burned asset
+    aID.forEach( async (n) => {
+        const a = await PM.getAssetByID(Number(n))
+        if( ! a.tokenAddress == '0x0000000000000000000000000000000000000000') {
+            const ABIS = [ERC20abi, ERC721abi]
+        let type = Number(Number(a.assetType)) == 1 ? "ERC20" : "ERC271"
 
-    assets.forEach( async (a) => {
-
-        let type = Number(Number(a.type)) == 1 ? "ERC20" : "ERC271"
-        if (type == "ERC20") {
-            const Tcontract = new ethers.Contract(a.tokenAddress, ERC20abi, signer)
-        } else {     const Tcontract = new ethers.Contract(a.tokenAddress, ERC721abi, signer)
-        }
-        let name = await Tcontract.name()
+        let Tcontract = new ethers.Contract(a.tokenAddress, ABIS[Number(a.assetType)], provider)
+        let namez = await Tcontract.name()
         let howMuch = Number(a.howMuch)
         aTableBody.innerHTML += `
             <td class="liable-id">
                 ${type}
             </td>
             <td class="amount-a">
-                ${howMuch}
+                ${ howMuch}
             </td>
             <td>
-                ${name}
+                ${namez}
             </td>
             <td>
-                <button class="btn btn-warning" onclick="burnAsset">
+                <button class="btn btn-info btn-burn" onclick="burnAsset(${Number(n)})">
                     Burn Asset
                 </button>
             </td>
 
             `
-
-
+        }
     })
 }
 
-function burnAsset(){
-
+async function burnAsset(id){
+    const PM= state.PM
+    const success = await PM.burnAsset(id, state.currentAddress);
+    if (success) alert(`${id} asset burrrrnd`)
+    
 }
 
 async function createAsset() {
