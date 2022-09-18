@@ -29,6 +29,11 @@ async function init() {
     const soulSpan = document.getElementById("soulSpan")
     const exePromisePlace = document.getElementById("exePromisePlace")
     const aTableBody = document.getElementById("aTableBody")
+    const assetAddress = document.getElementById("assetAddress")
+    const contractSymbol = document.getElementById("contractSymbol")
+    const assetAmountOrId = document.getElementById("assetAmountOrId")
+    const assetTo = document.getElementById("assetTo")
+    const assetType = document.getElementById("assetType")
 
 
     console.log("window.ethereum is", window.ethereum)
@@ -150,10 +155,11 @@ async function getAllAssets() {
     aID.forEach( async (n) => {
         const a = await PM.getAssetByID(Number(n))
         if( ! a.tokenAddress == '0x0000000000000000000000000000000000000000') {
-            const ABIS = [ERC20abi, ERC721abi]
+        const ABIS = [ERC20abi, ERC721abi]
         let type = Number(Number(a.assetType)) == 1 ? "ERC20" : "ERC271"
+        let abi =  ABIS[Number(a.assetType-1)]
 
-        let Tcontract = new ethers.Contract(a.tokenAddress, ABIS[Number(a.assetType)], provider)
+        let Tcontract = new ethers.Contract(a.tokenAddress, abi, provider)
         let namez = await Tcontract.name()
         let howMuch = Number(a.howMuch)
         aTableBody.innerHTML += `
@@ -184,9 +190,7 @@ async function burnAsset(id){
     
 }
 
-async function createAsset() {
 
-}
 
 
 async function setPMcontract() {
@@ -203,17 +207,66 @@ async function setPMcontract() {
 
 
 
-async function submitTransaction() {
 
-    // const ethersProvider = new ethers.providers.Web3Provider(window.ethereum)
-    // let signer = ethersProvider.getSigner()
-    // let PMpost = new ethers.Contract(sessionStorage.getItem(PMaddress), PMabi, ethersProvider)
+
+async function assetAddressChanged() {
+    state.AssetType = assetType.value
+}
+
+async function asseetTypeChanged() {
+    const provider =  new ethers.providers.Web3Provider(window.ethereum)
+    state.AssetType = assetType.value
+    console.log(state.AssetType)
+    let Asset;
+    let value = assetAddress.value
+    if (value.length == 42) {
+        if (Number(state.AssetType) == 1 ) {
+            Asset = new ethers.Contract(value, ERC20abi, provider)
+        } else {
+            Asset = new ethers.Contract(value, ERC721abi, provider)
+        }
+        console.log(Asset, 'vvvvvv')
+        state.assetAddress = value;
+        let name = await Asset.symbol()
+        contractSymbol.innerText = name
+    } else {
+        contractSymbol.innerText = "Asset Name"
+    }
+}
+
+async function assetCreateSubmit() {
+    console.log("submitted create asset with values:",state.assetAddress, state.AssetType,state.newAssetAmt,state.assetToValue )
+    let  assetTo = state.assetToValue ? state.assetToValue : "0x0000000000000000000000000000000000000000"
+
+    let success
+    const PM= state.PM
+    // (address contract_, uint8 assetType, uint256 howmuch_, address to_)
+    if (state.assetAddress == "0x0000000000000000000000000000000000000000") return alert('Asset cannotbe 0x0')
+    
+    try {
+        success = await PM.makeAsset(state.assetAddress, state.AssetType, state.newAssetAmt, assetTo);
+        
+    } catch {
+        alert(`transaction failed, token approval missing for PMmonster ${PMaddress}`)
+    }
+    if (success) alert(` asset created`)
+
+    /// validate
+
 
 }
 
 
-async function refreshAccountData() {
+function assetAmtIdChanged() {
+    state.newAssetAmt = assetAmountOrId.value;
+}
 
+function assetToChanged() {
+    if (assetTo.value.length == 42) {
+        state.assetToValue = assetTo.value
+    } else {
+        state.assetToValue = "0x0000000000000000000000000000000000000000"
+    }
 }
 
 

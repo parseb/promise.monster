@@ -60,6 +60,8 @@ function stringToUint(string memory s) public pure returns (uint) {
         E721.approve(address(PM), 1111);
         E721.approve(address(PM), 2222);
         E721.approve(address(PM), 3333);
+        E721.approve(address(PM), 701);
+        E721.approve(address(PM), 707);
 
         PM.makeAsset(address(E20), 1,  2* 10 ** 18, address(0));
         PM.mintSoul(); /// once
