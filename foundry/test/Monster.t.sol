@@ -40,7 +40,7 @@ contract MonsterTest is Test {
         ORANGE = GREEN;
 
         vm.expectRevert("already owned");
-        vm.prank(ORANGE, ORANGE);
+        vm.prank(GREEN, GREEN);
         PM.mintSoul();
     }
 
@@ -147,6 +147,9 @@ contract MonsterTest is Test {
         vm.prank(address(111222),address(111222));
         vm.expectRevert('already owned');
         PM.mintSoul();
+
+        uint sID = PM.getSoulID(address(111222));
+        assertTrue(sID !=0, "hasOrIsPromised[0] is reserved for soul id but soulID not saved at mint -likely cause:mint returns in beforeTransfer before saved at[0]");
 
 
         //// test is claimOnwer on promise and has soul but cannot mint another

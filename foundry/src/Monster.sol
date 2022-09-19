@@ -127,6 +127,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         if (globalID % 2 == 0) {
             _incrementID();
         }
+        //hasOrIsPromised[msg.sender][0] == globalID;
         _mint(msg.sender, globalID);
         hasOrIsPromised[msg.sender][0] == globalID;  /// @dev reversing order + transfer. duplication and multiple sb mint (confirmed)
                                                     /// @dev see https://goerli.etherscan.io/token/0x790813e2c96874d4200Fe9B63a92E771839A8254?a=13#readContract
