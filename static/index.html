@@ -159,8 +159,13 @@
                     bytes32 authority;
                     // string[] caveats;
                 } -->
-
-                  <div class="row delegation">
+                  <div class="row getSoul d-none" id="getSoul">
+                    <h5 class="mintstbplease">You need a record binding token to issue promises</h5>
+                    <button class="btn btn-info btn-burn" onclick="mintPermanentRecordToken()">
+                      Mint Conscience Bound Token
+                    </button>
+                  </div>
+                  <div class="row delegation" id="rowDelegation">
                     <div class="col-5"><input class="form-control" type="text" id="delegateInput" onChange="createPromiseFXchanged()" placeholder="I promise to (address or ENS)" aria-label="default input example">
                     </div>
                     <div class="col-5">
@@ -170,11 +175,20 @@
                     </div>
                     <div class="col-2"><Button class="btn btn-warning btn-burn " id="signPromiseButton" onclick="signPromise()">Sign</Button></div>
                     <div class="row" id="promiseFXargs">
-                      <div class="col-12">
-                        <Button class="btn btn-warning btn-burn ca-btn d-none" id="mintPromiseButton">Mint Promise</Button>
-                      </div>
                     </div>
-
+                    <div class="col-12 d-none" id="mintPromiseCol">
+                      <div class="row">
+                        <hr />
+                        <div class="col-6">
+                          <input type="text" class="form-control" id="startPTime" placeholder="START executable from now + this (seconds)">
+                        </div>
+                        <div class="col-6">
+                          <input type="text" class="form-control" id="endPTime" placeholder="END: up to START + this in seconds">
+                        </div>
+                      </div>
+                      <hr />
+                      <Button class="btn btn-info btn-burn ca-btn d-none" id="mintPromiseButton" onclick="mintPromise()">Mint Promise</Button>
+                    </div>
                   </div>
                   
 

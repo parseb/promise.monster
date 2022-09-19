@@ -12,7 +12,8 @@ let selectedAccount
 const stateColor = { 1: "light", 2: "success", 3: "danger", 4: "secondary" }
 const state = {
     liabilities: [],
-    assets: []
+    assets: [],
+    pargs: []
 }
 
 async function init() {
@@ -39,7 +40,11 @@ async function init() {
     const mintPromiseButton = document.getElementById("mintPromiseButton")
     const signPromiseButton = document.getElementById("signPromiseButton")
     const promiseFXargs = document.getElementById("promiseFXargs")
-
+    const startPTime = document.getElementById("startPTime")
+    const endPTime = document.getElementById("endPTime")
+    const mintPromiseCol = document.getElementById("mintPromiseCol")
+    const getSoul = document.getElementById("getSoul")
+    const rowDelegation = document.getElementById("rowDelegation")
 
     console.log("window.ethereum is", window.ethereum)
 
@@ -79,9 +84,13 @@ async function fetchPromises() {
     const PM = state.PM
     const soulID = await PM.getSoulID(state.currentAddress)
     const PMinterface = state.PMinterface
-
-
     state.soulID = Number(soulID)
+    
+    if ( soulID == 0 ) {
+        getSoul.classList.remove("d-none")
+        rowDelegation.classList.add("d-none")
+    } 
+
     let hasOrIsPromised = await PM.getPIDS(state.currentAddress)
     let PIDs = hasOrIsPromised.map(i => Number(i))
     let chainID = sessionStorage.getItem("chainID")
@@ -142,12 +151,20 @@ async function fetchPromises() {
     });
 }
 
+async function mintPermanentRecordToken(){
+    const tokenID = await state.PM.mintSoul().then((x)=>{
+        console.log(x)
+        connectStuff()
+    }
+    
+    )
+}
+
 
 async function executePromise(promiseID) {
     const PM = state.PM
     const success = await PM.executePromise(promiseID);
     if(String(success)=="success") alert(`${promiseID} executed. w\ Much success!`)
-
 }
 
 async function getAllAssets() {
@@ -281,41 +298,35 @@ async function createPromiseFXchanged(){
 
     if ( selectFXNewPromise.value != '0') {
         let x = 0
-        let args = selectFXNewPromise.value.split("(")[1].slice(0,-1).split(",")
+        let args = selectFXNewPromise.value.split("(")
+        state.currentFunction = args[0]
+        args = args[1].slice(0,-1).split(",")
+        state.currentArgs = args.map(s => String(s))
+        promiseFXargs.innerHTML = ''
         args.forEach((a) => {
-            promiseFXargs.innerHTML += `  <input type="text" class="form-control" id="${x}" placeholder="${a}">`
-
+            promiseFXargs.innerHTML += `  <input type="text" class="form-control" id="${x}" placeholder="${a}" onchange="onChageParg(${x})">`
+            x++
         })
     }
     const PM = state.PM
     const provider =  new ethers.providers.Web3Provider(window.ethereum)
 
-    let delegate = ! delegateInput.value.split("").includes(".") ? delegateInput.value : await provider.resolveName(delegateInput.value);
+    let delegate = delegateInput.value.split("").includes(".") ? await provider.resolveName(delegateInput.value) : delegateInput.value
     //const digest = PM.getDelegationTypedDataHash(delegation)
     let domainHash = await PM.domainHash()
     console.log(domainHash, delegate)
     const digest = getDigest(delegate, domainHash)
+    state.currentDelegate = delegate
     state.currentDigest = digest
 
     /// show mint promise button
 
     const iMonster = state.PMabi
-    // let calldata = iMonster.encodeFunctionData
-    // struct Delegation {
-    //     address delegate;
-    //     bytes32 authority;
-    // }
 
-    // struct SignedDelegation {
-    //     Delegation delegation;
-    //     bytes signature;
-    // }
+}
 
-    let signedDelegation = {
-        
-    }
-
-
+function onChageParg(argID) {
+    state.pargs[argID] = document.getElementById(String(argID)).value
 }
 
 function getDigest(deleGaddr, dH) {
@@ -333,14 +344,60 @@ async function signPromise() {
     /// @dev redo and use signTypedData 
     let signed = await signer.signMessage(ethers.utils.arrayify(state.currentDigest))
     state.currentSignature = signed
+    mintPromiseCol.classList.remove('d-none')
     mintPromiseButton.classList.remove('d-none')
     signPromiseButton.classList.add('d-none')
-    return signed
+    
+    let delegation = {
+        delegate: state.currentDelegate,
+        authority: "0x0000000000000000000000000000000000000000000000000000000000000000"
+    }
+
+    let signedDelegation = {
+        delegation: delegation,
+        signature: signed
+    }
+
+
+    state.currentSignedDelegation = signedDelegation
+    state.currentCallData = state.PMinterface.encodeFunctionData(state.currentFunction,state.pargs)
+    let start = Date.now() + Number(startPTime.value)
+    state.currentStartEnd = [Number(start), Number(start) + Number(endPTime.value)]
+    
+    //// disable promise fields on sign
+    /// add refresh button
+
+    let currentPromise = [Array(state.currentSignedDelegation), state.currentDelegate, state.currentCallData, state.currentStartEnd]
+    state.currentPromise = currentPromise
+    console.log(currentPromise)
+
     }
 
 
 
-function mintPromise() {
+async function mintPromise() {
+
+        // let calldata = iMonster.encodeFunctionData
+    // struct Delegation {
+    //     address delegate;
+    //     bytes32 authority;
+    // }
+
+    // struct SignedDelegation {
+    //     Delegation delegation;
+    //     bytes signature;
+    // }
+
+    // function mintPromise(
+    //     SignedDelegation memory delegation_,
+    //     address to_,
+    //     bytes memory callData_,
+    //     uint256[2] memory times_
+    // )
+
+     const submitPromise = await state.PM.mintPromise(state.currentSignedDelegation, state.currentDelegate, state.currentCallData, state.currentStartEnd)
+     state.submittedPromise = submitPromise
+     console.log("promise submitted")
 
 }
 
@@ -447,7 +504,7 @@ async function connectStuff() {
     activePage.classList.remove("d-none")
     landingPage.classList.add("d-none")
     monsterAddress.innerText = "|   👾: " + sessionStorage.getItem('PMaddress')
-    currentAddress.innerText = "|   🧍: " + sessionStorage.getItem('currentAccount')
+    currentAddress.innerText = "|   🏩: " + sessionStorage.getItem('currentAccount')
     disconnectBtn.classList.remove('d-none')
     await setPMcontract();
     const PMinterface = new ethers.utils.Interface(PMabi)
@@ -490,5 +547,3 @@ window.addEventListener('load', async () => {
 window.addEventListener('ready', async () => {
     btnExecuteP = document.getElementById("btnExecuteP")
 });
-
-

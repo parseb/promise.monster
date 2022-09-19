@@ -128,9 +128,11 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
             _incrementID();
         }
         _mint(msg.sender, globalID);
-        hasOrIsPromised[msg.sender][0] == globalID;
-
-        emit NewSoulAcquired(msg.sender, globalID);
+        hasOrIsPromised[msg.sender][0] == globalID;  /// @dev reversing order + transfer. duplication and multiple sb mint (confirmed)
+                                                    /// @dev see https://goerli.etherscan.io/token/0x790813e2c96874d4200Fe9B63a92E771839A8254?a=13#readContract
+                                                    /// address 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd has multiple uneaven ids on getPIDS
+        emit NewSoulAcquired(msg.sender, globalID); /// 0,14,16,22,24,26,41,43,45 - 3 sbs minted in a row
+                                                    /// retunrn in beforeTransfer... that would be and interesting kind of stupid
         return globalID;
     }
 
@@ -428,7 +430,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         } // token is asset
 
         if (from == address(0)) {
-            hasOrIsPromised[msg.sender].push(tokenId);
+            hasOrIsPromised[msg.sender].push(tokenId); /// @dev this is bad - to && msg.sender diverge
             return;
         }
         if (tokenId % 2 == 0) {

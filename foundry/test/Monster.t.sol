@@ -137,4 +137,19 @@ contract MonsterTest is Test {
     //     assertTrue(  (( x % 2) ) == 0, "FFF" );
     //     assertTrue( ( x % 10) !=0 , "ZZ");
     // }
+
+
+    function testCannotMintMultipleSouls() public {
+        vm.prank(address(111222),address(111222));
+        PM.mintSoul();
+        assertTrue(PM.getSoulID(address(111222)) != 0, "failed to get sbt");
+        
+        vm.prank(address(111222),address(111222));
+        vm.expectRevert('already owned');
+        PM.mintSoul();
+
+
+        //// test is claimOnwer on promise and has soul but cannot mint another
+
+    }
 }
