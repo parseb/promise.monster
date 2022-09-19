@@ -299,6 +299,10 @@ a.liable-id:hover {
   border-radius: 0px;
 }
 
+.btn-burn {
+  width: 100%
+}
+
 .ca-btn {
   margin-top: 5px;
 }

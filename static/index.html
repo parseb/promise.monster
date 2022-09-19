@@ -146,10 +146,37 @@
                   Create new promise
                 </button>
               </h2>
-              <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo"
+              <div id="flush-collapseTwo" class="accordion-collapse show" aria-labelledby="flush-headingTwo"
                 data-bs-parent="#accordionFlushExample">
                 <div class="accordion-body" id="create-new-promise-space">
+                  
+                  <!-- SignedDelegation memory delegation_,
+                  address to_,
+                  bytes memory callData_,
+                  uint256[2] memory times_ -->
+                  <!-- struct Delegation {
+                    address delegate;
+                    bytes32 authority;
+                    // string[] caveats;
+                } -->
 
+                  <div class="row delegation">
+                    <div class="col-5"><input class="form-control" type="text" id="delegateInput" onChange="createPromiseFXchanged()" placeholder="I promise to (address or ENS)" aria-label="default input example">
+                    </div>
+                    <div class="col-5">
+                      <select class="form-select" aria-label="select-function" id="selectFXNewPromise" onchange="createPromiseFXchanged()">
+                        <option value="0">that this function will successfully execute</option>
+                      </select>
+                    </div>
+                    <div class="col-2"><Button class="btn btn-warning btn-burn " id="signPromiseButton" onclick="signPromise()">Sign</Button></div>
+                    <div class="row" id="promiseFXargs">
+                      <div class="col-12">
+                        <Button class="btn btn-warning btn-burn ca-btn d-none" id="mintPromiseButton">Mint Promise</Button>
+                      </div>
+                    </div>
+
+                  </div>
+                  
 
 
 
@@ -165,7 +192,7 @@
                   Assets
                 </button>
               </h2>
-              <div id="flush-collapseThree" class="accordion-collapse collapse show"
+              <div id="flush-collapseThree" class="accordion-collapse collapse"
                 aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
                 <div class="accordion-body" id="asset-create-show-space">
                   <div class="row">

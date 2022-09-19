@@ -34,6 +34,11 @@ async function init() {
     const assetAmountOrId = document.getElementById("assetAmountOrId")
     const assetTo = document.getElementById("assetTo")
     const assetType = document.getElementById("assetType")
+    const selectFXNewPromise = document.getElementById("selectFXNewPromise")
+    const delegateInput = document.getElementById("delegateInput")
+    const mintPromiseButton = document.getElementById("mintPromiseButton")
+    const signPromiseButton = document.getElementById("signPromiseButton")
+    const promiseFXargs = document.getElementById("promiseFXargs")
 
 
     console.log("window.ethereum is", window.ethereum)
@@ -73,7 +78,7 @@ async function init() {
 async function fetchPromises() {
     const PM = state.PM
     const soulID = await PM.getSoulID(state.currentAddress)
-    const PMinterface = new ethers.utils.Interface(PMabi)
+    const PMinterface = state.PMinterface
 
 
     state.soulID = Number(soulID)
@@ -111,7 +116,7 @@ async function fetchPromises() {
         <td class="funcArgs">${FXA}</td>
         </div>
         <td id="exe-button">
-        <button class="btn btn-info float-sm-end" id="btnExecuteP" onclick="executePromise(${state.PIDs[countID-1]})">
+        <button class="btn btn-info float-sm-end btn-burn" id="btnExecuteP" onclick="executePromise(${state.PIDs[countID-1]})">
         execute
         </button>
         </td>
@@ -270,6 +275,93 @@ function assetToChanged() {
 }
 
 
+////// make promise space
+
+async function createPromiseFXchanged(){
+
+    if ( selectFXNewPromise.value != '0') {
+        let x = 0
+        let args = selectFXNewPromise.value.split("(")[1].slice(0,-1).split(",")
+        args.forEach((a) => {
+            promiseFXargs.innerHTML += `  <input type="text" class="form-control" id="${x}" placeholder="${a}">`
+
+        })
+    }
+    const PM = state.PM
+    const provider =  new ethers.providers.Web3Provider(window.ethereum)
+
+    let delegate = ! delegateInput.value.split("").includes(".") ? delegateInput.value : await provider.resolveName(delegateInput.value);
+    //const digest = PM.getDelegationTypedDataHash(delegation)
+    let domainHash = await PM.domainHash()
+    console.log(domainHash, delegate)
+    const digest = getDigest(delegate, domainHash)
+    state.currentDigest = digest
+
+    /// show mint promise button
+
+    const iMonster = state.PMabi
+    // let calldata = iMonster.encodeFunctionData
+    // struct Delegation {
+    //     address delegate;
+    //     bytes32 authority;
+    // }
+
+    // struct SignedDelegation {
+    //     Delegation delegation;
+    //     bytes signature;
+    // }
+
+    let signedDelegation = {
+        
+    }
+
+
+}
+
+function getDigest(deleGaddr, dH) {
+    let digestOutput =ethers.utils.solidityKeccak256(["string","bytes32","bytes32"],[
+            "\x19\x01",
+            dH,
+            ethers.utils.keccak256(state.PMinterface._encodeParams(['bytes32','address','bytes32'],[ethers.utils.id("Delegation(address delegate,bytes32 authority)"),deleGaddr,"0x0000000000000000000000000000000000000000000000000000000000000000"]))])
+        return digestOutput
+}
+
+async function signPromise() {
+    console.log("hereeee")
+    const provider =  new ethers.providers.Web3Provider(window.ethereum)
+    const signer = await provider.getSigner()
+    /// @dev redo and use signTypedData 
+    let signed = await signer.signMessage(ethers.utils.arrayify(state.currentDigest))
+    state.currentSignature = signed
+    mintPromiseButton.classList.remove('d-none')
+    signPromiseButton.classList.add('d-none')
+    return signed
+    }
+
+
+
+function mintPromise() {
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Connect wallet button pressed.
  */
@@ -358,8 +450,20 @@ async function connectStuff() {
     currentAddress.innerText = "|   🧍: " + sessionStorage.getItem('currentAccount')
     disconnectBtn.classList.remove('d-none')
     await setPMcontract();
+    const PMinterface = new ethers.utils.Interface(PMabi)
+    state.PMinterface = PMinterface
+    const allFunctions = Object.keys(state.PMinterface.functions)
+    allFunctions.forEach((f) => {
+        if (['makeAsset(address,uint8,uint256,address)','ownerOf(uint256)', 'burnAsset(uint256,address)','safeTransferFrom(address,address,uint256)'].includes(f)) {
+            selectFXNewPromise.innerHTML += `<option value="${f}">${f}</option>`
+        } else {
+            selectFXNewPromise.innerHTML += `<option value="${f}" disabled>${f}</option>`
+        }        
+    })
+    state.hasSignedPromise = false
     await fetchPromises();
     await getAllAssets();
+    
 }
 
 function disconnectStuff() {

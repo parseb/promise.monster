@@ -263,7 +263,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         if (P.times[0] > block.timestamp) {
             revert("soon");
         }
-        require(msg.sender == P.claimOwner || msg.sender == P.delegation.delegation.delegate, "Not promised to you");
+        require(msg.sender == P.claimOwner || msg.sender == P.delegation.delegation.delegate, "Not promised to you"); ///@dev case - promise is transfered: delegate can still execute. assign on transfer & &&
         if (P.times[1] < block.timestamp) {
             P.state = Standing.Expired;
             return false;
@@ -489,7 +489,6 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         caveat[this.getSoulID.selector] = true;
         caveat[this.getPromiseHistory.selector] = true;
         caveat[this.getSoulRecord.selector] = true;
-        caveat[this.mintSoul.selector] = true;
         caveat[this.approve.selector] = true;
         caveat[this.setApprovalForAll.selector] = true;
         caveat[this.transferFrom.selector] = true;
