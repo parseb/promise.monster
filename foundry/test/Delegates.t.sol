@@ -104,7 +104,7 @@ contract MonsterTest is Test {
             signedD1,
             hasDelegation,
             abi.encodeWithSignature("burnAsset(uint256,address)", assetID, third),
-            [block.timestamp, block.timestamp + 3245]
+            [uint256(11), uint256(22)]
         );
 
         vm.prank(willDelegate, willDelegate);
@@ -119,7 +119,7 @@ contract MonsterTest is Test {
             signedD1,
             hasDelegation,
             abi.encodeWithSignature("burnAsset(uint256,address)", assetID, third),
-            [block.timestamp, block.timestamp + 3245]
+            [uint256(11), uint256(22)]
         );
         assertTrue(PM.balanceOf(hasDelegation) == 1, "Already has a token");
         /// bearer of tokenized promise, still no sbt
@@ -132,11 +132,15 @@ contract MonsterTest is Test {
 
         Promise memory P;
         P = PM.getPromiseByID(promiseID);
-        assertFalse(P.times[0] > block.timestamp);
+        assertTrue(P.times[0] > block.timestamp);
 
         uint256 checkpoint = vm.snapshot();
 
         /// ---
+        skip(PM.getPromiseByID(promiseID).times[0]+1);
+
+        console.log(block.timestamp);
+        console.log(PM.getPromiseByID(promiseID).times[0]);
 
         vm.prank(hasDelegation, hasDelegation);
         PM.executePromise(promiseID);
@@ -147,11 +151,15 @@ contract MonsterTest is Test {
         vm.prank(hasDelegation, hasDelegation);
         PM.transferFrom(hasDelegation, third, promiseID);
 
+        skip(PM.getPromiseByID(promiseID).times[0]+1);
+
         vm.prank(third, third);
         PM.executePromise(promiseID);
 
         vm.revertTo(checkpoint);
         checkpoint = vm.snapshot();
+
+        skip(PM.getPromiseByID(promiseID).times[0]+1);
 
         vm.prank(address(5), address(5));
         vm.expectRevert("Not promised to you");
@@ -166,10 +174,13 @@ contract MonsterTest is Test {
         assertTrue(PM.balanceOf(third) == 1);
         assertFalse(mNFT.balanceOf(third) == 1);
 
+        skip(PM.getPromiseByID(promiseID).times[0]+1);
+        console.log(block.timestamp);
+        console.log(PM.getPromiseByID(promiseID).times[0]);
         vm.prank(third, third);
-        PM.executePromise(promiseID);
+        PM.executePromise(promiseID); /// false. expected true
 
-        /// has nft
+        /// has nft     
         assertTrue(mNFT.balanceOf(third) == 1);
         /// has no sbt/promsise(burned)/asset
         assertTrue(PM.balanceOf(third) == 0);
@@ -215,7 +226,7 @@ contract MonsterTest is Test {
             signedD1,
             hasDelegation,
             abi.encodeWithSignature("RandFunction(address)", address(4354), true),
-            [block.timestamp, block.timestamp + 3245]
+            [uint256(11), uint256(22)]
         );
 
         P = PM.getPromiseHistory(willDelegate);

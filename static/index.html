@@ -146,19 +146,10 @@
                   Create new promise
                 </button>
               </h2>
-              <div id="flush-collapseTwo" class="accordion-collapse show" aria-labelledby="flush-headingTwo"
+              <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo"
                 data-bs-parent="#accordionFlushExample">
                 <div class="accordion-body" id="create-new-promise-space">
                   
-                  <!-- SignedDelegation memory delegation_,
-                  address to_,
-                  bytes memory callData_,
-                  uint256[2] memory times_ -->
-                  <!-- struct Delegation {
-                    address delegate;
-                    bytes32 authority;
-                    // string[] caveats;
-                } -->
                   <div class="row getSoul d-none" id="getSoul">
                     <h5 class="mintstbplease">You need a record binding token to issue promises</h5>
                     <button class="btn btn-info btn-burn" onclick="mintPermanentRecordToken()">
@@ -258,7 +249,12 @@
                         </div>
                       </div>
                       <div class="row">
-                        <div class="col-12">
+                        <div class="col-12 d-none" id="approveAssetRow"> <!-- approve button disabled-->
+                          <button class="btn btn-info btn-burn ca-btn block" onclick="assetCreateSubmit()">
+                            approve asset
+                          </button>
+                        </div>
+                        <div class="col-12" id="createAssetRow">
                           <button class="btn btn-info btn-burn ca-btn block" onclick="assetCreateSubmit()">
                             create asset
                           </button>

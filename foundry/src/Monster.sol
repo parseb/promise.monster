@@ -147,7 +147,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     function makeAsset(address contract_, uint8 assetType, uint256 howmuch_, address to_) external returns (bool s) {
         globalID = incrementIDAsset();
         ///@dev noticed potential promise/2 and asset/10 id override. untested
-        require(contract != address(this), 'Matryoshkas not allowed'); /// @dev what would be the point?
+        ///@dev  require(contract_ != address(this), 'Matryoshkas not allowed'); /// @dev what would be the point?
         if (to_ == address(0)) {
             to_ = _msgSender();
         }
@@ -231,7 +231,8 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         newP.claimOwner = to_;
         newP.delegation = delegation_;
         newP.callData = callData_;
-        newP.times = times_;
+        uint start = block.timestamp + times_[0];
+        newP.times = [start, start + times_[1]];
 
         pID = _incrementID();
         if (pID % 10 == 0) {
@@ -263,11 +264,10 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         P = getPromise[promiseID];
 
         require(P.state == Standing.Created);
-        if (P.times[0] < block.timestamp) {
-            revert("soon");
-        }
+        if (P.times[0] > block.timestamp) revert("soon");
+        
         require(msg.sender == P.claimOwner || msg.sender == P.delegation.delegation.delegate, "Not promised to you"); ///@dev case - promise is transfered: delegate can still execute. assign on transfer & &&
-        if (P.times[1] > block.timestamp) {
+        if (P.times[1] < block.timestamp) {
             P.state = Standing.Expired;
             return false;
         }
@@ -280,11 +280,13 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
             emit KeptPromise(promiseID);
         } else {
             P.state = Standing.Broken;
-            revert("FFF");
+            // revert("FFF");
             emit BrokenPromise(promiseID);
         }
 
-        _tricklePromiseEndState(promiseID);
+        getPromise[promiseID] = P;
+
+        // _tricklePromiseEndState(promiseID); /// @dev promise transfer chained- alters reputation accross ownership. Advanced feature. later.
         _burn(promiseID);
 
         /// @dev sufficient replay protection ?

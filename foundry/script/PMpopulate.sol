@@ -7,9 +7,10 @@ import "../test/mocks/mockERC20.sol";
 import "../test/mocks/mockERC721.sol";
 
 contract PMpopulate is Script {
-    /// mumbai 0xD1CDD341F1d884D16Bbd2E0692230c58a162B523
-    /// goerli 0x790813e2c96874d4200Fe9B63a92E771839A8254
-    PromiseMonster PM = PromiseMonster(0xD1CDD341F1d884D16Bbd2E0692230c58a162B523);
+    /// mumbai 0x3CcD9A20D85d3b6dF08Db0cD457A3a5ba35cb6eb
+    /// goerli 0x9513a84B08fb684E440ffc0f20a9bBE6217948cf
+    /// optimism-goerli 0x14C620C5bFdfC017a6dd7146b41f1DCCa3A323E0
+    PromiseMonster PM = PromiseMonster(0x14C620C5bFdfC017a6dd7146b41f1DCCa3A323E0);
     MockERC20 E20;
     Mock721 E721;
 
@@ -70,34 +71,48 @@ function stringToUint(string memory s) public pure returns (uint) {
             setupDelegation(0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
             0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd,
             abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E20),1,10*10**18, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-            [block.timestamp, block.timestamp + 3245000]
+            [uint256(20), uint256(1234567)]
         );
 
         PM.mintPromise(
             setupDelegation(0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
             0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd,
             abi.encodeWithSignature("burnAsset(uint256,address)", 20, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-            [block.timestamp, block.timestamp + 3245000]
+            [uint256(20), uint256(1234567)]
         );
 
         PM.mintPromise(
             setupDelegation(0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
             0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd,
             abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E20),1,20*10**18, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-            [block.timestamp, block.timestamp + 3245000]
+            [uint256(20), uint256(1234567)]
         );
-        // PM.mintPromise(
-        //     setupDelegation(0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-        //     0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd,
-        //     abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E721),2,1111, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-        //     [block.timestamp, block.timestamp + 3245000]
-        // );
-        // PM.mintPromise(
-        //     setupDelegation(0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-        //     0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd,
-        //     abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E721),2,2222, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
-        //     [block.timestamp, block.timestamp + 3245000]
-        // );
+        PM.mintPromise(
+            setupDelegation(0x9E13201c6d7C5666a7E93390870006EA0f994C62),
+            0x9E13201c6d7C5666a7E93390870006EA0f994C62,
+            abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E20),2,1111, 0x9E13201c6d7C5666a7E93390870006EA0f994C62),
+            [uint256(20), uint256(1234567)]
+        );
+        PM.mintPromise(
+            setupDelegation(0x9E13201c6d7C5666a7E93390870006EA0f994C62),
+            0x9E13201c6d7C5666a7E93390870006EA0f994C62,
+            abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E20),2,2222, 0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd),
+            [uint256(20), uint256(1234567)]
+        );
+
+        PM.mintPromise(
+            setupDelegation(0x9E13201c6d7C5666a7E93390870006EA0f994C62),
+            0x9E13201c6d7C5666a7E93390870006EA0f994C62,
+            abi.encodeWithSignature("makeAsset(address,uint8,uint256,address)", address(E20),2,2222, 0x9E13201c6d7C5666a7E93390870006EA0f994C62),
+            [uint256(20), uint256(1234567)]
+        );
+
+        PM.makeAsset(address(E20), 1,  2* 10 ** 18, address(0));
+        PM.makeAsset(address(E20), 1,  2* 10 ** 18, address(0));
+        PM.makeAsset(address(E20), 1,  2* 10 ** 18, 0x9E13201c6d7C5666a7E93390870006EA0f994C62);
+        PM.makeAsset(address(E20), 1,  2* 10 ** 18, 0x9E13201c6d7C5666a7E93390870006EA0f994C62);
+        PM.makeAsset(address(E20), 1,  2* 10 ** 18, 0x9E13201c6d7C5666a7E93390870006EA0f994C62);
+
 
         vm.stopBroadcast();
     }

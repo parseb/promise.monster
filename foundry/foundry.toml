@@ -3,5 +3,6 @@ src = 'src'
 out = 'out'
 libs = ['lib']
 FOUNDRY_FUZZ_RUNS = 345645
+compiler_version = '0.8.15+commit.e14f2714.Linux.g++'
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

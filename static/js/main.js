@@ -45,6 +45,10 @@ async function init() {
     const mintPromiseCol = document.getElementById("mintPromiseCol")
     const getSoul = document.getElementById("getSoul")
     const rowDelegation = document.getElementById("rowDelegation")
+    const approveAssetRow = document.getElementById("approveAssetRow")
+    const createAssetRow = document.getElementById("createAssetRow")
+
+
 
     console.log("window.ethereum is", window.ethereum)
 
@@ -145,6 +149,8 @@ async function fetchPromises() {
         if(pl.liableID == state.soulID && state.soulID != 0) state.liabilities.push(pl)
     })
     soulSpan.innerHTML += `<a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${PIDs[0]}" class="pill soul">${PIDs[0]}</a>`
+    pillContainer.innerHTML = ``
+    // state.liabilities = [...new Set(state.liabilities)] 
     state.liabilities.slice(1).forEach((element, index) => {
         let pp = `<a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${PIDs.slice(1)[index]}" class="badge badge-${stateColor[Number(element.state)]}">${PIDs.slice(1)[index]}</a>`
         pillContainer.innerHTML +=pp
@@ -236,6 +242,21 @@ async function setPMcontract() {
 
 async function assetAddressChanged() {
     state.AssetType = assetType.value
+
+    // const provider =  new ethers.providers.Web3Provider(window.ethereum)
+    // let Asset;
+    // let balance;
+    // if (Number(state.AssetType) == 1 ) {
+    //     Asset = new ethers.Contract(value, ERC20abi, provider)
+    //     let balance = await Asset.balanceOf(state.currentAddress)
+    //     if (assetAmountOrId.value >= balance)
+
+    // } else {
+    //     Asset = new ethers.Contract(value, ERC721abi, provider)
+    //     if 
+    // }
+    // if (balance >)
+    // const createAssetRow = 
 }
 
 async function asseetTypeChanged() {
@@ -349,6 +370,16 @@ async function getDigest() {
 
 }
 
+async function getBlockTimestamp(){
+    const provider =  new ethers.providers.Web3Provider(window.ethereum)
+    const number = await provider.getBlockNumber()
+    const lastBlock = await  provider.getBlockWithTransactions(number)
+    state.currentBlockTime = lastBlock.timestamp
+    return lastBlock.timestamp
+
+}
+
+
 async function signPromise() {
     console.log("hereeee")
 
@@ -371,7 +402,7 @@ async function signPromise() {
     };
 
 
-    let signature = await signer._signTypedData(domain, types, state. );
+    let signature = await signer._signTypedData(domain, types, state.currentDelegation );
     state.currentSignature  = signature
     /// @dev redo and use signTypedData 
     // let signed = await signer.signMessage(state.currentDigest) //684e7d ///cea5ea
@@ -390,11 +421,12 @@ async function signPromise() {
         signature: state.currentSignature
     }
 
-
+    // let btNow = await getBlockTimestamp()
+    // console.log(btNow)
     state.currentSignedDelegation = signedDelegation
     state.currentCallData = state.PMinterface.encodeFunctionData(state.currentFunction,state.pargs)
-    let start = Date.now() + Number(startPTime.value)
-    state.currentStartEnd = [Number(start), Number(start) + Number(endPTime.value)]
+
+    state.currentStartEnd = [Number(startPTime.value), Number(endPTime.value)]
     
     //// disable promise fields on sign
     /// add refresh button
@@ -408,24 +440,6 @@ async function signPromise() {
 
 
 async function mintPromise() {
-
-        // let calldata = iMonster.encodeFunctionData
-    // struct Delegation {
-    //     address delegate;
-    //     bytes32 authority;
-    // }
-
-    // struct SignedDelegation {
-    //     Delegation delegation;
-    //     bytes signature;
-    // }
-
-    // function mintPromise(
-    //     SignedDelegation memory delegation_,
-    //     address to_,
-    //     bytes memory callData_,
-    //     uint256[2] memory times_
-    // )
 
      const submitPromise = await state.PM.mintPromise(state.currentSignedDelegation, state.currentDelegate, state.currentCallData, state.currentStartEnd)
      state.submittedPromise = submitPromise
