@@ -185,7 +185,10 @@ async function getAllAssets() {
         let namez = await Tcontract.name()
         let howMuch = Number(a.howMuch)
         aTableBody.innerHTML += `
-            <td class="liable-id">
+            <td class="token-id">
+                ${n}
+            </td>
+            <td class="type">
                 ${type}
             </td>
             <td class="amount-a">
@@ -269,7 +272,7 @@ async function assetCreateSubmit() {
         success = await PM.makeAsset(state.assetAddress, state.AssetType, state.newAssetAmt, assetTo);
         
     } catch {
-        alert(`transaction failed, token approval missing for PMmonster ${PMaddress}`)
+        alert(`transaction failed, token approval missing for PMmonster ${state.PMaddress}`)
     }
     if (success) alert(` asset created`)
 
@@ -317,7 +320,7 @@ async function createPromiseFXchanged(){
     console.log(domainHash, delegate)
     const digest = getDigest(delegate, domainHash)
     state.currentDelegate = delegate
-    state.currentDigest = digest
+    // state.currentDigest = digest
 
     /// show mint promise button
 
@@ -329,33 +332,62 @@ function onChageParg(argID) {
     state.pargs[argID] = document.getElementById(String(argID)).value
 }
 
-function getDigest(deleGaddr, dH) {
-    let digestOutput =ethers.utils.solidityKeccak256(["string","bytes32","bytes32"],[
-            "\x19\x01",
-            dH,
-            ethers.utils.keccak256(state.PMinterface._encodeParams(['bytes32','address','bytes32'],[ethers.utils.id("Delegation(address delegate,bytes32 authority)"),deleGaddr,"0x0000000000000000000000000000000000000000000000000000000000000000"]))])
-        return digestOutput
-}
-
-async function signPromise() {
-    console.log("hereeee")
-    const provider =  new ethers.providers.Web3Provider(window.ethereum)
-    const signer = await provider.getSigner()
-    /// @dev redo and use signTypedData 
-    let signed = await signer.signMessage(ethers.utils.arrayify(state.currentDigest))
-    state.currentSignature = signed
-    mintPromiseCol.classList.remove('d-none')
-    mintPromiseButton.classList.remove('d-none')
-    signPromiseButton.classList.add('d-none')
-    
+async function getDigest() {
+    // let digestOutput =ethers.utils.solidityKeccak256(["string","bytes32","bytes32"],[
+    //         "\x19\x01",
+    //         dH,
+    //         ethers.utils.keccak256(state.PMinterface._encodeParams(['bytes32','address','bytes32'],[ethers.utils.id("Delegation(address delegate,bytes32 authority)"),deleGaddr,"0x0000000000000000000000000000000000000000000000000000000000000000"]))])
+    //     return digestOutput
     let delegation = {
         delegate: state.currentDelegate,
         authority: "0x0000000000000000000000000000000000000000000000000000000000000000"
     }
 
+    state.currentDelegation = delegation
+    let digest222 = await state.PM.getDelegationTypedDataHash(delegation);
+
+
+}
+
+async function signPromise() {
+    console.log("hereeee")
+
+    const provider =  new ethers.providers.Web3Provider(window.ethereum)
+    const signer = await provider.getSigner()
+
+
+    const types = {
+        Delegation: [
+            { name: 'delegate', type: 'address' },
+            { name: 'authority', type: 'bytes32' }
+        ]
+    };
+
+    const domain = {
+        name: "Promise.Monster",
+        version: "1",
+        chainId: sessionStorage.chainID,
+        verifyingContract: state.PMaddress
+    };
+
+
+    let signature = await signer._signTypedData(domain, types, state. );
+    state.currentSignature  = signature
+    /// @dev redo and use signTypedData 
+    // let signed = await signer.signMessage(state.currentDigest) //684e7d ///cea5ea
+    // state.currentSignature =  ethers.utils.arrayify(signed)
+    mintPromiseCol.classList.remove('d-none')
+    mintPromiseButton.classList.remove('d-none')
+    signPromiseButton.classList.add('d-none')
+    
+    // let delegation = {
+    //     delegate: state.currentDelegate,
+    //     authority: "0x0000000000000000000000000000000000000000000000000000000000000000"
+    // }
+
     let signedDelegation = {
-        delegation: delegation,
-        signature: signed
+        delegation: state.currentDelegation,
+        signature: state.currentSignature
     }
 
 
@@ -367,10 +399,10 @@ async function signPromise() {
     //// disable promise fields on sign
     /// add refresh button
 
-    let currentPromise = [Array(state.currentSignedDelegation), state.currentDelegate, state.currentCallData, state.currentStartEnd]
+    let currentPromise = [state.currentSignedDelegation, state.currentDelegate, state.currentCallData, state.currentStartEnd]
     state.currentPromise = currentPromise
     console.log(currentPromise)
-
+    console.log(await state.PM.verifyDelegationSignature(state.currentSignedDelegation))
     }
 
 

@@ -147,7 +147,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
     function makeAsset(address contract_, uint8 assetType, uint256 howmuch_, address to_) external returns (bool s) {
         globalID = incrementIDAsset();
         ///@dev noticed potential promise/2 and asset/10 id override. untested
-
+        require(contract != address(this), 'Matryoshkas not allowed'); /// @dev what would be the point?
         if (to_ == address(0)) {
             to_ = _msgSender();
         }
@@ -263,11 +263,11 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         P = getPromise[promiseID];
 
         require(P.state == Standing.Created);
-        if (P.times[0] > block.timestamp) {
+        if (P.times[0] < block.timestamp) {
             revert("soon");
         }
         require(msg.sender == P.claimOwner || msg.sender == P.delegation.delegation.delegate, "Not promised to you"); ///@dev case - promise is transfered: delegate can still execute. assign on transfer & &&
-        if (P.times[1] < block.timestamp) {
+        if (P.times[1] > block.timestamp) {
             P.state = Standing.Expired;
             return false;
         }
