@@ -124,9 +124,8 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
         }
         require(hasOrIsPromised[msg.sender].length == 0 || hasOrIsPromised[msg.sender][0] == 0, "already owned");
         _incrementID();
-        if (globalID % 2 == 0) {
-            _incrementID();
-        }
+        if (globalID % 2 == 0) _incrementID();
+        
         //hasOrIsPromised[msg.sender][0] == globalID;
         _mint(msg.sender, globalID);
         hasOrIsPromised[msg.sender][0] == globalID;  /// @dev reversing order + transfer. duplication and multiple sb mint (confirmed)

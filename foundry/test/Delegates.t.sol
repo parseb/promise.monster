@@ -241,4 +241,70 @@ contract MonsterTest is Test {
         /// @dev ^ take this
         assertTrue(P[0].liableID == 0);
     }
+
+    function testDebugReturn() public {
+        uint256 assetID = createNFTAssetTokenTo(willDelegate);
+        assertTrue(assetID > 9, 'likely zero');
+        SignedDelegation memory signedD1 = testSetupDelegation(hasDelegation);
+
+
+        vm.startPrank(willDelegate, willDelegate);
+        PM.mintSoul();
+        uint soulID = PM .getSoulID(willDelegate);
+        uint nextPromiseIdShouldBe = soulID + 2;
+        /// promise same thing twitce 
+        
+        uint promiseID1 = PM.mintPromise(
+            signedD1,
+            hasDelegation,
+            abi.encodeWithSignature("burnAsset(uint256,address)", assetID, third),
+            [uint256(11), uint256(22)]
+        );
+
+        assertTrue(PM.balanceOf(hasDelegation) == 1, "Already has a token");
+
+
+        uint promiseID2 = PM.mintPromise(
+            signedD1,
+            hasDelegation,
+            abi.encodeWithSignature("burnAsset(uint256,address)", assetID, third),
+            [uint256(11), uint256(22)]
+        );
+        assertTrue(PM.balanceOf(hasDelegation) == 2, "Already has a token");
+        console.log(promiseID1, promiseID2);
+        assertTrue(promiseID2 == promiseID1 + 2, "unexpected promise id");
+        vm.stopPrank();
+
+        vm.startPrank(hasDelegation,hasDelegation);
+        // Promise memory statusBeforeExecution = PM.getPromiseByID(promiseID1);
+        Standing standingBefore = PM.getPromiseByID(promiseID1).state;
+
+        skip(PM.getPromiseByID(promiseID1).times[0]+1);
+        PM.executePromise(promiseID1);
+
+
+        // Promise memory promiseAferExecution = PM.getPromiseByID(promiseID1);
+        Standing standingAfter = PM.getPromiseByID(promiseID1).state;
+
+
+        assertTrue(standingBefore == Standing.Created, "standing before execution is not Created");
+        assertTrue(standingAfter == Standing.Honored , "standing after expected success execution is not Honored");
+        
+        /// ######################
+
+        skip(PM.getPromiseByID(promiseID2).times[0]+1);
+        PM.executePromise(promiseID2);
+
+
+        // Promise memory promiseAferExecution = PM.getPromiseByID(promiseID1);
+        standingAfter = PM.getPromiseByID(promiseID2).state;
+        
+        assertTrue(standingBefore == Standing.Created, "standing before execution is not Created");
+        assertTrue(standingAfter == Standing.Broken , "standing after expected success execution is not Honored"); /// status broken - same asset promised as burnable twice
+
+
+        vm.stopPrank();
+    }
+
+
 }
