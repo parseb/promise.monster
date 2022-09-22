@@ -242,7 +242,7 @@ contract MonsterTest is Test {
         assertTrue(P[0].liableID == 0);
     }
 
-    function testDebugReturn() public {
+    function testFailedPromisesWitchesStanding() public {
         uint256 assetID = createNFTAssetTokenTo(willDelegate);
         assertTrue(assetID > 9, 'likely zero');
         SignedDelegation memory signedD1 = testSetupDelegation(hasDelegation);
