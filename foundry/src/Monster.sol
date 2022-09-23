@@ -122,7 +122,7 @@ contract PromiseMonster is ERC721("Promise.Monster", unicode"👾"), Delegatable
             revert SoullessMachine();
             /// @dev contracts might have souls. don't know yet.
         }
-        require(hasOrIsPromised[msg.sender].length == 0 || hasOrIsPromised[msg.sender][0] == 0, "already owned");
+        require(getSoulID(msg.sender) == 0, "already owned");
         _incrementID();
         if (globalID % 2 == 0) _incrementID();
         

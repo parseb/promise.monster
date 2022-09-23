@@ -242,7 +242,7 @@ contract MonsterTest is Test {
         assertTrue(P[0].liableID == 0);
     }
 
-    function testFailedPromisesWitchesStanding() public {
+    function testPromisesWitchesStanding() public {
         uint256 assetID = createNFTAssetTokenTo(willDelegate);
         assertTrue(assetID > 9, 'likely zero');
         SignedDelegation memory signedD1 = testSetupDelegation(hasDelegation);
@@ -270,6 +270,9 @@ contract MonsterTest is Test {
             abi.encodeWithSignature("burnAsset(uint256,address)", assetID, third),
             [uint256(11), uint256(22)]
         );
+
+        /// created 2
+
         assertTrue(PM.balanceOf(hasDelegation) == 2, "Already has a token");
         console.log(promiseID1, promiseID2);
         assertTrue(promiseID2 == promiseID1 + 2, "unexpected promise id");
@@ -291,6 +294,8 @@ contract MonsterTest is Test {
         assertTrue(standingAfter == Standing.Honored , "standing after expected success execution is not Honored");
         
         /// ######################
+        uint snapID = vm.snapshot();
+        standingBefore = PM.getPromiseByID(promiseID2).state;
 
         skip(PM.getPromiseByID(promiseID2).times[0]+1);
         PM.executePromise(promiseID2);
@@ -302,9 +307,26 @@ contract MonsterTest is Test {
         assertTrue(standingBefore == Standing.Created, "standing before execution is not Created");
         assertTrue(standingAfter == Standing.Broken , "standing after expected success execution is not Honored"); /// status broken - same asset promised as burnable twice
 
-
         vm.stopPrank();
     }
+
+    // function testMintsMultipleSouls() public
+    //  {
+
+    //     vm.startPrank(address(4444),address(4444));
+
+    //     uint soulID1 = PM.mintSoul();
+    //     vm.expectRevert("already owned");
+    //     uint soulID2 = PM.mintSoul();
+
+    //     ////  0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd : has 41,43 47. 
+    //     /// https://goerli.etherscan.io/address/0xBD1302Ce69e65cAA2c85bB686A27437EaE00C6Fd
+    //     /// reproduce 
+
+
+    //     vm.stopPrank();
+
+    // }
 
 
 }
