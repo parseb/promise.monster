@@ -4,8 +4,8 @@
     1: "",
     5: {contract:"0x9513a84B08fb684E440ffc0f20a9bBE6217948cf", explorer:"https://goerli.etherscan.io/"},
     10:"",
-    420: {contract:"0x14C620C5bFdfC017a6dd7146b41f1DCCa3A323E0", explorer:"https://goerli-optimism.etherscan.io/"},
-    80001: { contract:"0x3CcD9A20D85d3b6dF08Db0cD457A3a5ba35cb6eb", explorer:"https://mumbai.polygonscan.com/"}
+    420: {contract:"0xdf764B507e53b729e5e0EfF24c93f38449997456", explorer:"https://goerli-optimism.etherscan.io/"},
+    80001: { contract:"0x1a035933F4C23D88664DbB9Cbd3A7979F83C7A57", explorer:"https://mumbai.polygonscan.com/"}
   }
 
 

@@ -7,10 +7,10 @@ import "../test/mocks/mockERC20.sol";
 import "../test/mocks/mockERC721.sol";
 
 contract PMpopulate is Script {
-    /// mumbai 0x3CcD9A20D85d3b6dF08Db0cD457A3a5ba35cb6eb
-    /// goerli 0x9513a84B08fb684E440ffc0f20a9bBE6217948cf
-    /// optimism-goerli 0x14C620C5bFdfC017a6dd7146b41f1DCCa3A323E0
-    PromiseMonster PM = PromiseMonster(0x14C620C5bFdfC017a6dd7146b41f1DCCa3A323E0);
+    /// mumbai 0x1a035933F4C23D88664DbB9Cbd3A7979F83C7A57
+    /// goerli 0x8e0Cf3ca2f139f2a01b5aB0122Cf788f51E93ead
+    /// optimism-goerli 0xdf764B507e53b729e5e0EfF24c93f38449997456
+    PromiseMonster PM = PromiseMonster(0xdf764B507e53b729e5e0EfF24c93f38449997456);
     MockERC20 E20;
     Mock721 E721;
 

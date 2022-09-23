@@ -33,7 +33,8 @@ contract MonsterTest is Test {
     function testSoulMint() public {
         vm.expectRevert(PromiseMonster.SoullessMachine.selector);
         PM.mintSoul();
-        vm.prank(GREEN, GREEN);
+        vm.prank(address(2223), address(2223));
+        GREEN = address(2223);
         uint256 soulID = PM.mintSoul();
         assertTrue(soulID > 0, "globalId is 0");
         assertTrue(soulID % 2 != 0, "soulID is even");

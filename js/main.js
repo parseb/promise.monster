@@ -145,10 +145,12 @@ async function fetchPromises() {
 
     });
 
+    const idOfSoul = await PM.getSoulID(state.currentAddress);
+
     promises['Pl'].forEach((pl) => {
         if(pl.liableID == state.soulID && state.soulID != 0) state.liabilities.push(pl)
     })
-    soulSpan.innerHTML += `<a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${PIDs[0]}" class="pill soul">${PIDs[0]}</a>`
+    soulSpan.innerHTML += `<a href="${getPMAddress[chainID].explorer}token/${state.PMaddress}?a=${idOfSoul}" class="pill soul">${idOfSoul}</a>`
     pillContainer.innerHTML = ``
     // state.liabilities = [...new Set(state.liabilities)] 
     state.liabilities.slice(1).forEach((element, index) => {
